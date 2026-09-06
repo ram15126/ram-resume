@@ -9,6 +9,7 @@ import { buildMascot } from "./os/mascot.js";
 import { initScheme, onSchemeChange } from "./os/scheme.js";
 import { initWallpaper, refreshWallpaper } from "./os/wallpaper.js";
 import { launch } from "./apps/registry.js";
+import { consumeArrival } from "./lib/arrival.js";
 
 const SEEN_KEY = "ram98:booted";
 
@@ -39,7 +40,7 @@ function init() {
 
   // Coming back from 2026: play the CRT opening back up, and skip the
   // boot screen — they have already been here.
-  const arriving = new URLSearchParams(location.search).get("arrive") === "2006";
+  const arriving = consumeArrival(2006);
   if (arriving && !reduceMotion) {
     document.body.classList.add("tm-arriving");
     setTimeout(function () { document.body.classList.remove("tm-arriving"); }, 900);

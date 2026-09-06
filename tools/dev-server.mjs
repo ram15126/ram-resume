@@ -107,17 +107,32 @@ const server = http.createServer(async function (req, res) {
     return;
   }
 
-  fs.readFile(target, function (err, data) {
-    if (err) {
-      res.statusCode = 404;
-      res.setHeader("Content-Type", "text/plain");
-      res.end("Not found: " + rel);
-      return;
-    }
-    res.setHeader("Content-Type", TYPES[path.extname(target).toLowerCase()] || "application/octet-stream");
-    res.setHeader("Cache-Control", "no-store");   // so edits show up on reload
-    res.end(data);
-  });
+  // vercel.json sets cleanUrls, so in production "/future" serves
+  // future/index.html. Without the same rule here, a link that works on
+  // the deployed site 404s locally — and a difference between dev and
+  // production is exactly the kind nobody thinks to check until it is
+  // live. An extensionless path is tried as itself, then ".html", then
+  // "/index.html", which is the order Vercel resolves them in.
+  const attempts = path.extname(target)
+    ? [target]
+    : [target, target + ".html", path.join(target, "index.html")];
+
+  (function serve(list) {
+    const file = list[0];
+    fs.readFile(file, function (err, data) {
+      if (err) {
+        if (list.length > 1) return serve(list.slice(1));
+        res.statusCode = 404;
+        res.setHeader("Content-Type", "text/plain");
+        res.end("Not found: " + rel);
+        return;
+      }
+      res.setHeader("Content-Type",
+        TYPES[path.extname(file).toLowerCase()] || "application/octet-stream");
+      res.setHeader("Cache-Control", "no-store");   // so edits show up on reload
+      res.end(data);
+    });
+  })(attempts);
 });
 
 server.listen(PORT, function () {

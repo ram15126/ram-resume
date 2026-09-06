@@ -8,6 +8,7 @@
 
 import { voice } from "../config/voice.js";
 import { scene as CFG } from "../config/scene.js";
+import { consumeArrival } from "../../src/lib/arrival.js";
 import { buildPage } from "./sections.js";
 import { createPointer } from "./pointer.js";
 import { mountAssistant } from "./assistant.js";
@@ -180,7 +181,7 @@ updateScrolled();
 // ----------------------------------------------------------- the warp
 //  Played once, on arrival from 1998. Landing here directly skips it —
 //  nobody should sit through a transition they did not trigger.
-const arriving = new URLSearchParams(location.search).get("arrive") === "2026" && !reduceMotion;
+const arriving = consumeArrival(2026) && !reduceMotion;
 
 if (arriving) {
   document.body.classList.add("is-warping");

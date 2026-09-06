@@ -12,7 +12,7 @@
 // Root-absolute and extension-less: vercel.json sets cleanUrls, so a
 // ".html" URL is redirected, and a relative one resolves differently
 // depending on whether the current URL has a trailing slash.
-const DEST = "/future/?arrive=2026";
+const DEST = "/future?arrive=2026";
 const FROM_YEAR = 2006;
 const TO_YEAR = 2026;
 const SPIN_MS = 2100;
