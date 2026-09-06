@@ -31,6 +31,11 @@ export const assistant = {
 
   placeholder: "Ask a question about Ramakrishnan…",
 
+  // Emoji, punctuation or numbers with no words in them. Stripped of
+  // non-letters this is an empty question, which used to fall through
+  // to search and come back with the top of his résumé.
+  noWords: "I only speak words, sorry. Try me with an actual question.",
+
   // ---- The corner mascot ----------------------------------------
   //  The assistant was one icon among thirteen and most visitors would
   //  never open it. This is the Office Assistant pattern — a character
@@ -66,9 +71,10 @@ export const assistant = {
   //  cost nothing and never reach the model.
   smallTalk: [
     {
-      match: ["hi", "hey", "heyy", "heyyy", "hello", "helo", "yo", "sup", "hiya",
+      match: ["hi", "hey", "hello", "helo", "yo", "sup", "hiya", "howdy",
               "hola", "namaste", "vanakkam", "good morning", "good afternoon",
-              "good evening", "greetings"],
+              "good evening", "morning", "afternoon", "evening", "greetings",
+              "wassup", "whats up", "what up", "whatsup", "waddup"],
       // Only greetings may carry trailing words ("hey there").
       lead: true,
       reply: "Hey — good to have you here. Ask me anything about my work: the three " +
@@ -89,6 +95,25 @@ export const assistant = {
       reply: "Try me on any of these: what I actually do day to day, whether I can " +
              "code, what I have built, a time I got something wrong and what I did " +
              "about it, or what I am looking for next."
+    },
+    {
+      match: ["how are you", "how r u", "how are u", "how you doing",
+              "how are you doing", "hows it going", "how is it going",
+              "you good", "how do you do", "whats good"],
+      reply: "Running fine — I am a chatbot on a résumé, so my day is not exactly " +
+             "eventful. Yours is probably more interesting. What do you want to know?"
+    },
+    {
+      match: ["are you there", "you there", "anyone there", "hello anyone",
+              "test", "testing", "is this working", "does this work",
+              "is anyone there", "u there"],
+      reply: "Here and working. Go on, ask me something harder than that."
+    },
+    {
+      match: ["ok", "okay", "k", "kk", "alright", "right", "hmm", "hm",
+              "lol", "haha", "lmao", "nice one", "fair", "fair enough",
+              "interesting", "wow", "damn", "no way"],
+      reply: "Ha. Anything else you want to know about his work?"
     },
     {
       match: ["thanks", "thank you", "thanks a lot", "thankyou", "thx", "ty",
@@ -271,12 +296,17 @@ export const assistant = {
       "Do not sign off. End on the answer itself — no closing invitation, no email address — unless the question is about hiring, availability or getting in touch, or you genuinely could not answer it.",
 
       // ---- when you do not know ----
-      "If you genuinely do not know, say it in one short natural sentence — \"I have not written that up yet\" — then immediately offer the closest thing you do know, or point them at ramakrishnan15126@gmail.com. Never dead-end.",
+      "If you genuinely do not know, say so in one short line and make it light — you never wrote that part down, and it is your own site, so the joke is on you. Then immediately offer the closest thing you do know. Never dead-end, and never send them to your email over something they were only curious about.",
 
       // ---- the honesty rules, unchanged in substance ----
       "Never invent or estimate a number, date, client name, job title, salary or metric. If you do not have the figure, do not produce one.",
       "You do not write code and do not claim to. You specify the system, direct AI-assisted development, and verify every output. Say it that way.",
       "Leads are \"sourced and qualified\", never \"converted\" or \"closed\".",
+      // The dates say "Present" three times, but a model reading a list
+      // top to bottom narrates it as a career path and files the lower
+      // two under "before that". Running three at once is the point.
+      "All three roles are CURRENT and run at the same time: co-founder at NeoArk Digital, Marketing & SEO Intern at Siva Comics, Marketing Intern at Digimabble. Never describe any of them as past or as something you did before another.",
+      "Greenlane AI is Digimabble's own product, not a client of theirs. Say \"our product\" or \"Digimabble's product\".",
       "The 43 to 65 site-health improvement is real and you should state it. You specified the 17 prioritised findings; the client's own team shipped the fixes. Credit it that way round.",
       "Skill ratings are your own self-assessment, not a measured metric. Say so if you quote one.",
       "Do not speculate about your opinions, availability, salary expectations, or anything personal you have not written down.",
@@ -284,10 +314,36 @@ export const assistant = {
     ],
 
     // What it says when retrieval comes back empty or weak.
-    refusal:
-      "I have not written about that, so anything I said would be a guess — and I " +
-      "would rather not. Ask me about my roles, the systems I have built, how I " +
-      "work, or what I am still learning. Or email me at ramakrishnan15126@gmail.com.",
+    // ---- when there is genuinely nothing to answer from ----
+    //  One fixed refusal, repeated, makes a visitor feel they hit a wall
+    //  three times. These rotate, they blame the gap on Ram rather than
+    //  on the person asking, and none of them offers his email: someone
+    //  who just asked what his favourite film is is not going to write
+    //  to him about it. The joke is the honest answer — the context for
+    //  this really is missing from what he wrote.
+    //
+    //  `refusals[0]` is the fallback the browser shows if a response
+    //  ever arrives without an answer, so keep the plainest one first.
+    refusals: [
+      "Ram never wrote anything about that, so I have got nothing — and I am not " +
+      "going to make something up on his behalf. Ask me about his work, his " +
+      "roles, or what he has built.",
+
+      "Blank. Total blank. He wrote pages on SEO audits and not one line about " +
+      "this. Bring it up with him — the gap is his, not mine.",
+
+      "Nope, not in there. He forgot to tell me about that one, which I am " +
+      "choosing to take personally. Try me on his work instead.",
+
+      "I have been given a lot of notes and none of them cover this. Consider it " +
+      "officially flagged with him. Meanwhile, ask me something about his work.",
+
+      "That is a hole in my training, and the person who trained me is the one " +
+      "with the CV on this site. Ask me what he actually does instead.",
+
+      "He did not write that down, so I would only be guessing — and a guessing " +
+      "résumé bot is nobody's friend. Ask me about the work."
+    ],
 
     // Shown under every answer.
     disclaimer: "AI-generated from his own notes. Verify anything that matters."

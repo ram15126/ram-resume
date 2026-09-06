@@ -325,7 +325,7 @@ export const assistantApp = {
 
         const data = await response.json();
         thinking.bubble.classList.remove("is-thinking");
-        renderMarkdown(thinking.bubble, data.answer || assistant.guardrails.refusal);
+        renderMarkdown(thinking.bubble, data.answer || assistant.guardrails.refusals[0]);
 
         // Without a model key the server quotes him rather than writing
         // a reply. Say so on the message itself — a quote presented as

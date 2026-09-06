@@ -149,6 +149,19 @@ function buildSystemPrompt(passages) {
   ].join("\n");
 }
 
+/**
+ * One of the refusals, at random.
+ *
+ * Asking three things he has not written about and getting the same
+ * sentence back three times reads as a broken bot. Getting three
+ * different ones reads as a bot with a sense of humour about its own
+ * gaps, which is the truth of it.
+ */
+function pickRefusal() {
+  const list = assistant.guardrails.refusals;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
 // ------------------------------------------------------------ small talk
 /**
  * Answer a greeting as a greeting.
@@ -166,9 +179,20 @@ function smallTalk(question) {
     .toLowerCase()
     .replace(/[^a-z\s]/g, " ")
     .split(/\s+/)
-    .filter(Boolean);
+    .filter(Boolean)
+    // People stretch a greeting for warmth — "hii", "heyyy", "hellooo",
+    // "sooo". Listing every spelling is hopeless, so a run of the same
+    // letter at the end of a word, or any run of three, collapses to
+    // one. Only the end is collapsed so "cool" does not become "col".
+    .map(function (w) {
+      return w.replace(/(.)\1{2,}/g, "$1").replace(/(.)\1+$/, "$1");
+    });
 
-  if (!words.length || words.length > 5) return null;   // a real question, not a hello
+  // Nothing but emoji, punctuation or digits. Left alone this reaches
+  // search as an empty query and comes back with the top of his résumé.
+  if (!words.length) return assistant.noWords;
+
+  if (words.length > 5) return null;                    // a real question, not a hello
   const joined = words.join(" ");
 
   for (const entry of assistant.smallTalk || []) {
@@ -319,8 +343,14 @@ export default async function handler(req, res) {
   //  letting the model decide means an unanswerable question costs
   //  nothing and cannot be talked into a plausible-sounding invention.
   if (!passages.length || !result.confident) {
+    // The refusal tells the visitor his notes have a hole in them. This
+    // line is how he finds out WHICH hole: every unanswerable question
+    // lands in the Vercel function log, so the gaps come from what
+    // people actually ask rather than from what he imagines they will.
+    console.warn("UNANSWERED: " + JSON.stringify(question));
+
     res.status(200).json({
-      answer: assistant.guardrails.refusal,
+      answer: pickRefusal(),
       passages: [],
       grounded: false,
       mode: "refused",
@@ -356,7 +386,7 @@ export default async function handler(req, res) {
       asked.some(function (t) { return headingWords.indexOf(t) !== -1; });
 
     res.status(200).json({
-      answer: quoted || assistant.guardrails.refusal,
+      answer: quoted || pickRefusal(),
       note: !quoted ? null : (overBudget
         ? "Busy right now, so this is quoted straight from his notes rather than " +
           "written for your question. Ask again in a minute for a composed answer."
@@ -392,7 +422,7 @@ export default async function handler(req, res) {
       // rather than showing a blank bubble.
       const quoted = extractAnswer(passages);
       res.status(200).json({
-        answer: quoted || assistant.guardrails.refusal,
+        answer: quoted || pickRefusal(),
         note: "The model returned nothing, so this is quoted from his notes instead.",
         passages: cited,
         grounded: true,
@@ -419,7 +449,7 @@ export default async function handler(req, res) {
     console.error("Model call failed (" + provider.id + "):", err.message);
     const quoted = extractAnswer(passages);
     res.status(200).json({
-      answer: quoted || assistant.guardrails.refusal,
+      answer: quoted || pickRefusal(),
       note: "The model is not responding right now, so this is quoted directly " +
             "from his notes. He is at ramakrishnan15126@gmail.com.",
       passages: cited,

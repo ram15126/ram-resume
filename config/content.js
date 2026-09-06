@@ -156,7 +156,7 @@ export const content = {
       dates: "Jan 2026 – Present",
       sign: "DIGIMABBLE",
       bullets: [
-        "Drive demand generation for Greenlane AI, a healthcare B2B SaaS product sold to doctors and private practices.",
+        "Drive demand generation for Greenlane AI, Digimabble's healthcare B2B SaaS product sold to doctors and private practices.",
         "Run the product's LinkedIn programme end to end: positioning, planning, copywriting and publishing.",
         "Write and run cold email sequences to medical practices — list building, segmentation, copy and follow-up.",
         "Research competitor positioning and audience segments to inform content strategy and messaging.",
