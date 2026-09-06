@@ -1,0 +1,379 @@
+// =====================================================================
+//  ICON ART — 16x16 pixel icons drawn from letter maps, the same
+//  technique the platformer résumé uses for its sprites.
+//
+//  Each row is a string. Each letter is one pixel. "." is transparent.
+//  Change a letter, get a different icon. No image files involved.
+// =====================================================================
+
+import { brand } from "../../config/theme.js";
+
+// Letter -> colour, from the fixed 16-colour VGA palette Windows icons
+// were drawn in. These do NOT follow the colour scheme: Windows never
+// recoloured its icons when you changed the appearance scheme, and if
+// they did follow it, every cached icon would go stale on every switch.
+const INK = {
+  K: "#000000",  // outline black
+  W: "#FFFFFF",  // white
+  L: "#C0C0C0",  // light grey (the fixed icon grey, not the chrome grey)
+  G: "#808080",  // mid grey
+  D: "#404040",  // dark grey
+  R: brand.logo,      // the brand red, fixed like the logo
+  A: brand.logoDark,
+  Y: "#FFFF00",  // folder yellow
+  O: "#808000",  // folder shadow
+  B: "#0000A8",  // blue
+  C: "#00FFFF",  // cyan screen
+  E: "#008000",  // green
+  T: "#008080",  // teal
+  S: "#D9A066",  // skin
+  P: "#800080"   // purple
+};
+
+export const iconMaps = {
+  // A desktop PC — About Me
+  computer: [
+    "................",
+    "..KKKKKKKKKKKK..",
+    "..KWWWWWWWWWWK..",
+    "..KWBBBBBBBBWK..",
+    "..KWBCCCCCCBWK..",
+    "..KWBCWWWWCBWK..",
+    "..KWBCWKKWCBWK..",
+    "..KWBCCCCCCBWK..",
+    "..KWBBBBBBBBWK..",
+    "..KWWWWWWWWWWK..",
+    "..KKKKKKKKKKKK..",
+    "....KLLLLLLK....",
+    "...KLLLLLLLLK...",
+    "..KLLLLLLLLLLK..",
+    "..KKKKKKKKKKKK..",
+    "................"
+  ],
+
+  // A manila folder — My Work
+  folder: [
+    "................",
+    "................",
+    "..KKKKK.........",
+    ".KYYYYYK........",
+    ".KYYYYYKKKKKKK..",
+    ".KYYYYYYYYYYYYK.",
+    ".KYYYYYYYYYYYYK.",
+    ".KYYYYYYYYYYYYK.",
+    ".KYYYYYYYYYYYYK.",
+    ".KYYYYYYYYYYYYK.",
+    ".KYOOOOOOOOOOYK.",
+    ".KYYYYYYYYYYYYK.",
+    ".KYOOOOOOOOOOYK.",
+    ".KYYYYYYYYYYYYK.",
+    ".KKKKKKKKKKKKKK.",
+    "................"
+  ],
+
+  // A page with a turned corner — Projects
+  document: [
+    "................",
+    "...KKKKKKKKK....",
+    "...KWWWWWWWKK...",
+    "...KWKKKKWWKGK..",
+    "...KWWWWWWWWWK..",
+    "...KWKKKKKKWWK..",
+    "...KWWWWWWWWWK..",
+    "...KWKKKKKKKWK..",
+    "...KWWWWWWWWWK..",
+    "...KWKKKKKKKWK..",
+    "...KWWWWWWWWWK..",
+    "...KWKKKKKWWWK..",
+    "...KWWWWWWWWWK..",
+    "...KKKKKKKKKKK..",
+    "................",
+    "................"
+  ],
+
+  // A bar chart — Skills
+  chart: [
+    "................",
+    "..KKKKKKKKKKKK..",
+    "..KWWWWWWWWWWK..",
+    "..KWWWWWWWRRWK..",
+    "..KWWWWWWWRRWK..",
+    "..KWWWWWWWRRWK..",
+    "..KWWWEEWWRRWK..",
+    "..KWWWEEWWRRWK..",
+    "..KWBBEEWWRRWK..",
+    "..KWBBEEWWRRWK..",
+    "..KWBBEEWWRRWK..",
+    "..KWBBEEWWRRWK..",
+    "..KWWWWWWWWWWK..",
+    "..KKKKKKKKKKKK..",
+    "................",
+    "................"
+  ],
+
+  // A closed book — Education
+  book: [
+    "................",
+    "................",
+    "..KKKKKKKKKKKK..",
+    "..KRRRRRRRRRRK..",
+    "..KRWWWWWWWWRK..",
+    "..KRWKKKKKKWRK..",
+    "..KRWWWWWWWWRK..",
+    "..KRWKKKKKKWRK..",
+    "..KRWWWWWWWWRK..",
+    "..KRWKKKKWWWRK..",
+    "..KRWWWWWWWWRK..",
+    "..KRAAAAAAAARK..",
+    "..KRRRRRRRRRRK..",
+    "..KKKKKKKKKKKK..",
+    "................",
+    "................"
+  ],
+
+  // A sealed envelope — Contact
+  envelope: [
+    "................",
+    "................",
+    "..KKKKKKKKKKKK..",
+    "..KWWWWWWWWWWK..",
+    "..KWKWWWWWWKWK..",
+    "..KWWKWWWWKWWK..",
+    "..KWWWKWWKWWWK..",
+    "..KWWWWKKWWWWK..",
+    "..KWWWKWWKWWWK..",
+    "..KWWKWWWWKWWK..",
+    "..KWKWWWWWWKWK..",
+    "..KWWWWWWWWWWK..",
+    "..KKKKKKKKKKKK..",
+    "................",
+    "................",
+    "................"
+  ],
+
+  // A page with a red badge — Resume.pdf
+  pdf: [
+    "................",
+    "...KKKKKKKKK....",
+    "...KWWWWWWWKK...",
+    "...KWWWWWWWWGK..",
+    "...KWWWWWWWWWK..",
+    "...KWWWWWWWWWK..",
+    "...KWRRRRRRWWK..",
+    "...KWRWWWWRWWK..",
+    "...KWRRRRRRWWK..",
+    "...KWRWWWWWWWK..",
+    "...KWRWWWWWWWK..",
+    "...KWWWWWWWWWK..",
+    "...KWWWWWWWWWK..",
+    "...KKKKKKKKKKK..",
+    "................",
+    "................"
+  ],
+
+  // A spiral notepad — Notepad
+  notepad: [
+    "................",
+    "...K.K.K.K.K....",
+    "..KKKKKKKKKKK...",
+    "..KWWWWWWWWWK...",
+    "..KWKKKKKKKWK...",
+    "..KWWWWWWWWWK...",
+    "..KWKKKKKKKWK...",
+    "..KWWWWWWWWWK...",
+    "..KWKKKKKKKWK...",
+    "..KWWWWWWWWWK...",
+    "..KWKKKKKWWWK...",
+    "..KWWWWWWWWWK...",
+    "..KWKKKKKKKWK...",
+    "..KWWWWWWWWWK...",
+    "..KKKKKKKKKKK...",
+    "................"
+  ],
+
+  // An artist's palette — Paint
+  paint: [
+    "................",
+    ".....KKKKK......",
+    "...KKWWWWWKK....",
+    "..KWWWWWWWWWK...",
+    "..KWRRWWWBBWK...",
+    ".KWWRRWWWBBWWK..",
+    ".KWWWWWWWWWWWK..",
+    ".KWYYWWKKWEEWK..",
+    ".KWYYWKLLKEEWK..",
+    ".KWWWWKLLKWWWK..",
+    "..KWWWWKKWWWK...",
+    "..KKWWWWWWWKK...",
+    "....KKWWWKK.....",
+    "......KKK.......",
+    "................",
+    "................"
+  ],
+
+  // A magnifying glass — Audit Trainer
+  magnifier: [
+    "................",
+    "....KKKKK.......",
+    "...KWWWWWK......",
+    "..KWCCCCCWK.....",
+    "..KWCCCCCWK.....",
+    "..KWCCCCCWK.....",
+    "..KWCCCCCWK.....",
+    "...KWWWWWK......",
+    "....KKKKKK......",
+    "......KKKKK.....",
+    ".......KDDKK....",
+    "........KDDKK...",
+    ".........KDDKK..",
+    "..........KDDK..",
+    "...........KK...",
+    "................"
+  ],
+
+  // A camera — Gallery
+  camera: [
+    "................",
+    "................",
+    ".....KKKK.......",
+    "....KLLLLK......",
+    "..KKKKKKKKKKKK..",
+    "..KLLLLLLLLLRK..",
+    "..KLKKKKKKKLLK..",
+    "..KLKWWWWWKLLK..",
+    "..KLKWKKKWKLLK..",
+    "..KLKWKKKWKLLK..",
+    "..KLKWWWWWKLLK..",
+    "..KLKKKKKKKLLK..",
+    "..KLLLLLLLLLLK..",
+    "..KKKKKKKKKKKK..",
+    "................",
+    "................"
+  ],
+
+  // A monitor with a swatch — Display properties
+  display: [
+    "................",
+    "..KKKKKKKKKKKK..",
+    "..KWWWWWWWWWWK..",
+    "..KWCCCCCCCCWK..",
+    "..KWCRRCCEECWK..",
+    "..KWCRRCCEECWK..",
+    "..KWCCCCCCCCWK..",
+    "..KWCBBCCYYCWK..",
+    "..KWCBBCCYYCWK..",
+    "..KWCCCCCCCCWK..",
+    "..KWWWWWWWWWWK..",
+    "..KKKKKKKKKKKK..",
+    "....KLLLLLLK....",
+    "..KKLLLLLLLLKK..",
+    "..KKKKKKKKKKKK..",
+    "................"
+  ],
+
+  // A portal ring with a forward arrow — Time Machine
+  timemachine: [
+    "................",
+    ".....KKKKKK.....",
+    "...KKCCCCCCKK...",
+    "..KCCKKKKKKCCK..",
+    ".KCCKRRRRRRKCCK.",
+    ".KCKRRWWWWRRKCK.",
+    "KCCKRWWKKWWRKCCK",
+    "KCKRRWKKKKWRRKCK",
+    "KCKRRWKKKKWRRKCK",
+    "KCCKRWWKKWWRKCCK",
+    ".KCKRRWWWWRRKCK.",
+    ".KCCKRRRRRRKCCK.",
+    "..KCCKKKKKKCCK..",
+    "...KKCCCCCCKK...",
+    ".....KKKKKK.....",
+    "................"
+  ],
+
+  // A speech bubble over a document — Ask About Me
+  assistant: [
+    "................",
+    "..KKKKKKKKKKKK..",
+    "..KWWWWWWWWWWK..",
+    "..KWKKKKKKKKWK..",
+    "..KWWWWWWWWWWK..",
+    "..KWKKKKKKWWWK..",
+    "..KWWWWWWWWWWK..",
+    "..KWKKKKKKKKWK..",
+    "..KWWWWWWWWWWK..",
+    "..KKKKKKKKKKKK..",
+    "....KKKKKKKK....",
+    "...KRRRRRRRRK...",
+    "...KRWKWKWKRK...",
+    "...KRRRRRRRRK...",
+    "....KKKRKKKK....",
+    "......KRK......."
+  ],
+
+  // The Start button badge — four panes in the hero red
+  start: [
+    "................",
+    "................",
+    "....KKKK.KKKK...",
+    "...KRRRRKAAAAK..",
+    "...KRRRRKAAAAK..",
+    "...KRRRRKAAAAK..",
+    "....KKKK.KKKK...",
+    "................",
+    "....KKKK.KKKK...",
+    "...KAAAAKRRRRK..",
+    "...KAAAAKRRRRK..",
+    "...KAAAAKRRRRK..",
+    "....KKKK.KKKK...",
+    "................",
+    "................",
+    "................"
+  ]
+};
+
+const cache = new Map();
+
+/**
+ * Render one icon map to a data URL at the given pixel scale.
+ * Cached, so the same icon at the same size is only drawn once.
+ */
+export function iconUrl(name, scale = 2) {
+  const key = name + "@" + scale;
+  if (cache.has(key)) return cache.get(key);
+
+  const map = iconMaps[name];
+  if (!map) return "";
+
+  const colours = INK;
+  const size = map.length;
+  const canvas = document.createElement("canvas");
+  canvas.width = size * scale;
+  canvas.height = size * scale;
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = false;
+
+  for (let y = 0; y < size; y++) {
+    const row = map[y];
+    for (let x = 0; x < row.length; x++) {
+      const ch = row[x];
+      if (ch === "." || !colours[ch]) continue;
+      ctx.fillStyle = colours[ch];
+      ctx.fillRect(x * scale, y * scale, scale, scale);
+    }
+  }
+
+  const url = canvas.toDataURL();
+  cache.set(key, url);
+  return url;
+}
+
+/** An <img> element for an icon, ready to drop into the DOM. */
+export function iconImg(name, scale = 2, alt = "") {
+  const img = document.createElement("img");
+  img.src = iconUrl(name, scale);
+  img.alt = alt;
+  img.className = "pixel-icon";
+  img.draggable = false;
+  return img;
+}

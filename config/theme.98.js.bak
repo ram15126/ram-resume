@@ -1,0 +1,277 @@
+// =====================================================================
+//  THEME — colours, wallpapers, fonts.
+//
+//  The OS ships the authentic Windows 98 look: #C0C0C0 chrome, the navy
+//  title-bar gradient, the teal desktop. Visitors can switch to any
+//  other scheme from Display Properties → Appearance, exactly as they
+//  could in 1998.
+//
+//  HONESTY NOTE: "Windows Standard" below uses the real Windows 98
+//  values. The other schemes are reconstructions — they take the names
+//  and the character of the schemes that shipped with Windows 98, but
+//  the hex values are matched by eye, not sampled from the originals.
+//  "Signature Red" is not a Windows scheme at all; it is Ramakrishnan's
+//  own colour.
+// =====================================================================
+
+// ---------------------------------------------------------------------
+//  The base palette — the real Windows 98 "Windows Standard" scheme.
+//  Every other scheme below lists ONLY the values it changes.
+// ---------------------------------------------------------------------
+const base = {
+  // ---- Chrome: windows, buttons, taskbar ----
+  face:        "#C0C0C0",  // "3D Objects" — the grey of every window
+  faceLight:   "#DFDFDF",  // soft edge of a raised bevel
+  highlight:   "#FFFFFF",  // bright edge of a raised bevel
+  shadow:      "#808080",  // soft edge of a sunken bevel
+  shadowDark:  "#000000",  // hard outer edge
+  text:        "#000000",  // "Button Text" — labels on the grey chrome
+  textDisabled:"#808080",
+
+  // ---- Content areas ----
+  //  These are deliberately independent of the chrome colours. In every
+  //  scheme except High Contrast the window interior stays white, so
+  //  headings and muted text inside it need their own values rather
+  //  than borrowing the chrome's — a pale grey that reads fine on the
+  //  Eggplant chrome would vanish on the white behind it.
+  well:        "#FFFFFF",  // "Window" — inside of text and content panes
+  wellText:    "#000000",  // "Window Text"
+  wellAccent:  "#000080",  // section headings inside content
+  wellMuted:   "#5A5A5A",  // secondary text inside content
+  wellAlt:     "#F2F2F2",  // cards and callouts sitting on the well
+  wellRule:    "#D6D6D6",  // hairlines inside content
+  link:        "#0000EE",
+
+  // ---- Title bars ----
+  titleFrom:   "#000080",  // "Active Title Bar", left end of the gradient
+  titleTo:     "#1084D0",  // right end
+  titleText:   "#FFFFFF",
+  titleIdle:   "#808080",  // "Inactive Title Bar"
+  titleIdleTo: "#B5B5B5",
+  // Windows 98 used #C0C0C0 here, which is 2.2:1 against the bar
+  // behind it — genuinely hard to read. White is the one deliberate
+  // deviation from the original palette, so the title of a window
+  // sitting behind another can still be read.
+  titleIdleText: "#FFFFFF",
+
+  // ---- Selection / emphasis ----
+  accent:      "#000080",  // "Selected Items"
+  accentDark:  "#000060",
+  accentText:  "#FFFFFF",
+
+  // ---- Desktop ----
+  desktop:     "#008080",  // the classic teal
+  iconLabel:   "#FFFFFF",
+  iconLabelBg: "#000080",
+
+  // ---- Status colours used inside apps ----
+  ok:          "#008000",
+  warn:        "#806000",
+  bad:         "#A00000",
+  info:        "#000080"
+};
+
+// ---------------------------------------------------------------------
+//  Schemes. Each one lists only what it changes from `base`.
+//  To add your own: copy a block, give it a new id and name, change
+//  the hexes. It appears in Display Properties automatically.
+// ---------------------------------------------------------------------
+export const schemes = [
+  {
+    id: "windows-standard",
+    name: "Windows Standard",
+    palette: {}
+  },
+  {
+    id: "brick",
+    name: "Brick",
+    palette: {
+      face: "#C0B4B0", faceLight: "#DCD2CE", shadow: "#7C7270",
+      titleFrom: "#800000", titleTo: "#C06048",
+      accent: "#800000", accentDark: "#600000", iconLabelBg: "#800000",
+      desktop: "#7C7270"
+    }
+  },
+  {
+    id: "desert",
+    name: "Desert",
+    palette: {
+      face: "#D5CCB0", faceLight: "#EAE4D2", shadow: "#8A836C",
+      titleFrom: "#6B6B00", titleTo: "#C4B64C",
+      accent: "#6B6B00", accentDark: "#4E4E00", iconLabelBg: "#6B6B00",
+      desktop: "#6E6B3F"
+    }
+  },
+  {
+    id: "eggplant",
+    name: "Eggplant",
+    palette: {
+      face: "#6E6A72", faceLight: "#8F8B95", highlight: "#B2AEB8",
+      shadow: "#454149", shadowDark: "#000000",
+      text: "#FFFFFF", textDisabled: "#B2AEB8",
+      titleFrom: "#423C4C", titleTo: "#6D6478",
+      titleIdle: "#4E4A54", titleIdleTo: "#6A6670",
+      accent: "#4A5D4A", accentDark: "#374637", iconLabelBg: "#4A5D4A",
+      desktop: "#37343C"
+    }
+  },
+  {
+    id: "plum",
+    name: "Plum",
+    palette: {
+      face: "#C0B0C8", faceLight: "#DCD0E2", shadow: "#7E7286",
+      titleFrom: "#503060", titleTo: "#9070A8",
+      accent: "#503060", accentDark: "#3A2246", iconLabelBg: "#503060",
+      desktop: "#5C4468"
+    }
+  },
+  {
+    id: "rose",
+    name: "Rose",
+    palette: {
+      face: "#D4C0C8", faceLight: "#EBDCE2", shadow: "#8C7C84",
+      titleFrom: "#804060", titleTo: "#C08098",
+      accent: "#804060", accentDark: "#602E48", iconLabelBg: "#804060",
+      desktop: "#7C5868"
+    }
+  },
+  {
+    id: "spruce",
+    name: "Spruce",
+    palette: {
+      face: "#C0C0C0", faceLight: "#DFDFDF", shadow: "#808080",
+      titleFrom: "#005000", titleTo: "#3C9440",
+      accent: "#005000", accentDark: "#003A00", iconLabelBg: "#005000",
+      desktop: "#2C5C34"
+    }
+  },
+  {
+    id: "slate",
+    name: "Slate",
+    palette: {
+      face: "#A8B0B8", faceLight: "#C8D0D8", shadow: "#6C747C",
+      titleFrom: "#405060", titleTo: "#7890A8",
+      accent: "#405060", accentDark: "#2C3A48", iconLabelBg: "#405060",
+      desktop: "#4A5560"
+    }
+  },
+  {
+    id: "storm",
+    name: "Storm",
+    palette: {
+      face: "#9A9A9A", faceLight: "#BEBEBE", shadow: "#5E5E5E",
+      titleFrom: "#303840", titleTo: "#68707C",
+      accent: "#303840", accentDark: "#1E242A", iconLabelBg: "#303840",
+      desktop: "#383838"
+    }
+  },
+  {
+    id: "wheat",
+    name: "Wheat",
+    palette: {
+      face: "#D8D0B8", faceLight: "#EEE8D6", shadow: "#8E8874",
+      titleFrom: "#806840", titleTo: "#C0A870",
+      accent: "#806840", accentDark: "#5E4C2E", iconLabelBg: "#806840",
+      desktop: "#6E6248"
+    }
+  },
+  {
+    id: "rainy-day",
+    name: "Rainy Day",
+    palette: {
+      face: "#B0B4BC", faceLight: "#D2D6DE", shadow: "#72767E",
+      titleFrom: "#4C5464", titleTo: "#8C94A4",
+      accent: "#4C5464", accentDark: "#363C48", iconLabelBg: "#4C5464",
+      desktop: "#5C6470"
+    }
+  },
+  {
+    id: "signature-red",
+    name: "Signature Red",
+    palette: {
+      titleFrom: "#8E1616", titleTo: "#D62828",
+      accent: "#A61E1E", accentDark: "#7C1616", iconLabelBg: "#8E1616",
+      wellAccent: "#A61E1E", link: "#0A3D91",
+      desktop: "#1E6B63"
+    }
+  },
+  {
+    id: "high-contrast-black",
+    name: "High Contrast Black",
+    palette: {
+      face: "#000000", faceLight: "#000000", highlight: "#FFFFFF",
+      shadow: "#FFFFFF", shadowDark: "#FFFFFF",
+      text: "#FFFFFF", textDisabled: "#A0A0A0",
+      well: "#000000", wellText: "#FFFFFF", link: "#40C0FF",
+      wellAccent: "#40C0FF", wellMuted: "#B0B0B0",
+      wellAlt: "#1A1A1A", wellRule: "#606060",
+      titleFrom: "#000000", titleTo: "#000000", titleText: "#FFFFFF",
+      titleIdle: "#000000", titleIdleTo: "#000000", titleIdleText: "#A0A0A0",
+      accent: "#0000C0", accentDark: "#000080", iconLabelBg: "#0000C0",
+      desktop: "#000000",
+      ok: "#00E000", warn: "#E0C000", bad: "#FF6060", info: "#40C0FF"
+    }
+  }
+];
+
+export const defaultScheme = "windows-standard";
+
+/** Merge a scheme's overrides onto the base palette. */
+export function paletteFor(schemeId) {
+  const found = schemes.find(function (s) { return s.id === schemeId; });
+  return Object.assign({}, base, found ? found.palette : {});
+}
+
+// ---------------------------------------------------------------------
+//  Wallpapers. Windows 98 shipped small tileable bitmaps; these are
+//  drawn from code rather than loaded as files, so the whole site stays
+//  dependency-free. "type" decides how a wallpaper is laid down:
+//    none  — no wallpaper, the desktop colour of the current scheme
+//    tile  — a small pattern repeated across the desktop
+//    scene — one full-bleed picture stretched to fit
+// ---------------------------------------------------------------------
+export const wallpapers = [
+  { id: "none",         name: "(None)",       type: "none"  },
+  { id: "clouds",       name: "Clouds",       type: "scene" },
+  { id: "blue-rivets",  name: "Blue Rivets",  type: "tile"  },
+  { id: "straw-mat",    name: "Straw Mat",    type: "tile"  },
+  { id: "tiles",        name: "Tiles",        type: "tile"  },
+  { id: "circles",      name: "Circles",      type: "tile"  },
+  { id: "pinstripe",    name: "Pinstripe",    type: "tile"  },
+  { id: "triangles",    name: "Triangles",    type: "tile"  },
+  { id: "waves",        name: "Waves",        type: "tile"  },
+  { id: "bubbles",      name: "Bubbles",      type: "tile"  },
+  { id: "carved-stone", name: "Carved Stone", type: "tile"  },
+  { id: "black-thatch", name: "Black Thatch", type: "tile"  },
+  { id: "hills",        name: "Green Hills",  type: "scene" },
+  { id: "night",        name: "Night Shift",  type: "scene" }
+];
+
+export const defaultWallpaper = "clouds";
+
+// ---------------------------------------------------------------------
+//  The brand mark on the boot screen and the Start button. Windows did
+//  not recolour its logo when you changed scheme, and neither does this
+//  one — so these two stay fixed whatever palette is chosen.
+// ---------------------------------------------------------------------
+export const brand = {
+  logo:     "#D62828",
+  logoDark: "#8E1616"
+};
+
+// ---- Type ----
+//  fontUi   : the OS chrome and app bodies
+//  fontMono : the terminal and Notepad
+//  fontPixel: the boot screen and the Start-menu spine only
+export const fonts = {
+  ui:    "'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, 'Segoe UI', system-ui, sans-serif",
+  mono:  "'Lucida Console', 'DejaVu Sans Mono', Consolas, monospace",
+  pixel: "'Press Start 2P', 'Courier New', monospace"
+};
+
+// ---- Behaviour ----
+export const behaviour = {
+  bootMs: 2200,             // how long the boot screen sits before the desktop
+  skipBootOnReturn: true,   // returning visitors go straight to the desktop
+  openOnLoad: ["about"]     // window(s) that open by themselves after boot
+};

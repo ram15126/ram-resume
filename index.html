@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ramakrishnan S — Desktop</title>
+<meta name="description" content="The interactive résumé of Ramakrishnan S — AI-driven digital marketing, SEO / AEO / GEO, content strategy and marketing automation. Chennai, Tamil Nadu.">
+<meta name="theme-color" content="#C0C0C0">
+
+<meta property="og:title" content="Ramakrishnan S — Desktop">
+<meta property="og:description" content="An interactive résumé built as a desktop operating system. Open the windows.">
+<meta property="og:type" content="profile">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/os.css">
+</head>
+<body>
+
+<a class="skip-link" href="#windows">Skip to content</a>
+
+<!-- ------------------------------------------------------- boot screen -->
+<div id="boot">
+  <div class="boot-inner">
+    <div class="boot-logo" aria-hidden="true">
+      <span class="boot-logo-pane"></span>
+      <span class="boot-logo-pane"></span>
+      <span class="boot-logo-pane"></span>
+      <span class="boot-logo-pane"></span>
+    </div>
+    <p class="boot-name" id="boot-name">Ramakrishnan S</p>
+    <p class="boot-role" id="boot-role">AI-Driven Digital Marketing</p>
+    <div class="boot-bar"><div class="boot-bar-fill" id="boot-bar-fill"></div></div>
+    <p class="boot-hint">Starting…&nbsp; <span>click to skip</span></p>
+  </div>
+</div>
+
+<!-- ---------------------------------------------------------- desktop -->
+<main id="desktop">
+  <div id="icons" class="icon-layer"></div>
+  <div id="windows" class="window-layer"></div>
+</main>
+
+<!-- ------------------------------------------------------- start menu -->
+<div id="start-menu" class="start-menu" hidden></div>
+
+<!-- ---------------------------------------------------------- taskbar -->
+<footer id="taskbar" class="taskbar">
+  <button type="button" id="start-button" class="start-button" aria-expanded="false" aria-haspopup="true">Start</button>
+  <div class="task-sep" aria-hidden="true"></div>
+  <div id="task-buttons" class="task-buttons"></div>
+  <div class="tray">
+    <span class="tray-icon" aria-hidden="true"></span>
+    <span id="clock" class="clock">--:--</span>
+  </div>
+</footer>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

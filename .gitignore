@@ -1,0 +1,14 @@
+.env
+.env.local
+.env.*.local
+node_modules/
+.vercel/
+
+# Private working notes. The ingest tool already skips this folder, so the
+# search index never contained them — but the raw files hold work history
+# and a client project memory, and this repo is public.
+knowledge/_private/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db

@@ -1,0 +1,1099 @@
+/* =====================================================================
+   RAM · 2026
+
+   Modelled on airborne.studio. The things worth copying were never the
+   graphics — that site has no canvas at all. They are:
+
+     1  TWO COLOURS. Ink and cream, no accent, no grey scale. Adding a
+        third is the fastest way to lose the look.
+     2  TWO TYPEFACES, hard split. One shouts (display, huge, uppercase,
+        0.8 line-height). One speaks (grotesk, 500 weight, 1.4 leading).
+        There is no third voice.
+     3  ZERO BORDER RADIUS. Everything square, everywhere.
+     4  A 12-COLUMN GRID inside a fixed frame.
+     5  THE INVERSION. Dark acts, then a cream act, then dark again.
+        That colour flip is the chapter device that carries a long page.
+
+   Gravity and Neue Haas Grotesk are commercial. Archivo Black and
+   Archivo are the closest free pair, and being one superfamily they
+   sit together better than a borrowed match would.
+   ===================================================================== */
+
+:root {
+  --ink:        #191919;
+  --cream:      #FBF4E6;
+  --ink-dim:    rgba(25, 25, 25, 0.58);
+  --cream-dim:  rgba(251, 244, 230, 0.62);
+  --rule:       rgba(25, 25, 25, 0.16);
+  --rule-dark:  rgba(251, 244, 230, 0.18);
+
+  --font-display: "Archivo Black", "Arial Black", system-ui, sans-serif;
+  --font-body: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* The frame: a fixed max width with a generous gutter, exactly like
+     the reference's `max-w-frame` container. */
+  --frame: 1440px;
+  --gutter: clamp(20px, 4.4vw, 72px);
+  --col-gap: clamp(16px, 1.8vw, 28px);
+
+  /* Vertical rhythm. Sections are tall and airy — crowding is what
+     makes an editorial page look like a CV. */
+  --act-pad: clamp(88px, 13vh, 190px);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+/* Square. Everywhere. No exceptions — this is doing real work. */
+* { border-radius: 0 !important; }
+
+html {
+  background: var(--ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: clamp(15px, 1.05vw, 17px);
+  font-weight: 500;
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The smooth-scroll driver eases the NATIVE scroll position rather than
+   translating the page. Translating a pinned #page works visually but
+   kills `position: sticky` — a transformed, fixed ancestor gives sticky
+   nothing to stick to — and the sticky section headers below depend on
+   it. So the page stays in ordinary flow. */
+
+::selection { background: var(--cream); color: var(--ink); }
+.act-cream ::selection { background: var(--ink); color: var(--cream); }
+
+a { color: inherit; text-decoration: none; }
+
+.skip-link {
+  position: fixed; left: -9999px; top: 0; z-index: 999;
+  background: var(--cream); color: var(--ink);
+  padding: 10px 16px; font-size: 12px; font-weight: 600;
+}
+.skip-link:focus { left: 12px; top: 12px; }
+:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+/* ==========================================================  progress */
+#progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px;
+  z-index: 90; pointer-events: none;
+  background: rgba(251, 244, 230, 0.14);
+}
+#progress-fill {
+  display: block; height: 100%; width: 100%;
+  transform: scaleX(0); transform-origin: 0 50%;
+  background: var(--cream);
+}
+
+/* ===============================================================  nav */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 80;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: clamp(14px, 2vh, 26px) var(--gutter);
+  mix-blend-mode: difference;   /* stays legible over ink AND cream */
+  color: #FFFFFF;
+  pointer-events: none;
+}
+.nav a { pointer-events: auto; }
+.nav-mark {
+  font-family: var(--font-display);
+  font-size: clamp(15px, 1.3vw, 19px);
+  letter-spacing: -0.02em;
+}
+.nav-links { display: flex; gap: clamp(14px, 2vw, 32px); }
+.nav-link {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  opacity: 0.75; transition: opacity .25s ease;
+}
+.nav-link:hover { opacity: 1; }
+
+/* =============================================================  acts */
+.act {
+  position: relative;
+  padding: var(--act-pad) 0;
+  /* The reference laps sections by a pixel so a background seam can
+     never show as a hairline between two blocks of the same colour. */
+  margin-top: -1px;
+}
+.act-ink   { background: var(--ink);   color: var(--cream); }
+.act-cream { background: var(--cream); color: var(--ink); }
+
+.frame {
+  width: 100%;
+  max-width: var(--frame);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* ==============================================================  hero */
+.act-hero {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding-top: clamp(96px, 14vh, 170px);
+}
+.act-hero .frame { width: 100%; }
+
+.hero-name {
+  margin: 0;
+  font-family: var(--font-display);
+  /* The reference sets its display face at 132px with 105.6px leading —
+     a ratio of 0.8. That negative-feeling leading is most of why the
+     type reads as a solid block rather than a headline. */
+  font-size: clamp(76px, 21vw, 300px);
+  line-height: 0.8;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+  /* Negative letter-spacing still emits a trailing space after the last
+     glyph; pull it back so the block aligns to the grid. */
+  margin-right: -0.035em;
+}
+
+.hero-line {
+  margin: clamp(22px, 3.4vh, 44px) 0 0;
+  max-width: 22ch;
+  font-size: clamp(24px, 3.4vw, 48px);
+  font-weight: 500;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+}
+
+.hero-sub {
+  margin: clamp(18px, 2.6vh, 30px) 0 0;
+  max-width: 48ch;
+  font-size: clamp(14px, 1.15vw, 17px);
+  line-height: 1.55;
+  color: var(--cream-dim);
+}
+
+.hero-hint {
+  position: absolute;
+  /* Centred, because the badge took the bottom-left. */
+  left: 50%; transform: translateX(-50%);
+  bottom: clamp(20px, 4vh, 40px);
+  margin: 0;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--cream-dim);
+}
+
+/* ===========================================================  eyebrow */
+/*  11px, weight 600, uppercase, wide tracking. The reference's only
+    small-text style — resisting the urge to invent a second one is
+    what keeps the hierarchy this clean. */
+.eyebrow {
+  display: flex; align-items: baseline; gap: 14px;
+  margin: 0 0 clamp(20px, 3.2vh, 40px);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+}
+.act-ink .eyebrow { color: var(--cream-dim); }
+.act-cream .eyebrow { color: var(--ink-dim); }
+.eyebrow-index { opacity: 0.7; }
+.eyebrow::after {
+  content: ""; flex: 1 1 auto; height: 1px;
+  background: currentColor; opacity: 0.28;
+}
+
+/* ===========================================================  display */
+.display {
+  margin: 0 0 clamp(24px, 4vh, 54px);
+  font-family: var(--font-display);
+  font-size: clamp(30px, 5.6vw, 92px);
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  max-width: 18ch;
+}
+/*  Each word sits in a clipping box and rises out of it. Masked-word
+    reveals read as deliberate; a plain fade reads as a slow page. */
+.display .word { display: inline-block; overflow: hidden; vertical-align: bottom; }
+.display .word-inner {
+  display: inline-block;
+  transform: translateY(102%);
+  transition: transform .82s cubic-bezier(.16, 1, .3, 1);
+  transition-delay: calc(var(--w) * 62ms);
+}
+.is-in .display .word-inner { transform: translateY(0); }
+
+/* ==============================================================  body */
+.body-lead { max-width: 58ch; margin: 0 0 clamp(28px, 4.4vh, 60px); }
+.body-text {
+  margin: 0 0 1em;
+  font-size: clamp(16px, 1.35vw, 21px);
+  font-weight: 500;
+  line-height: 1.48;
+}
+.body-text:last-child { margin-bottom: 0; }
+.act-ink .body-text { color: var(--cream-dim); }
+.act-cream .body-text { color: var(--ink-dim); }
+
+/* The intro's supporting paragraphs, on the 12-col grid */
+.body-cols {
+  display: grid;
+  gap: var(--col-gap) clamp(24px, 4vw, 72px);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+  max-width: 1040px;
+}
+
+/* =============================================================  items */
+.item-list {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--rule);
+}
+.act-ink .item-list { border-color: var(--rule-dark); }
+
+/*  A ruled list, not a card grid. The reference never boxes anything —
+    it separates with hairlines and space, which is why it reads as a
+    document rather than a dashboard. */
+.item {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+  gap: clamp(16px, 3vw, 56px);
+  padding: clamp(26px, 3.6vh, 52px) 0;
+  border-bottom: 1px solid var(--rule);
+}
+.act-ink .item { border-color: var(--rule-dark); }
+
+.item-head { min-width: 0; }
+.item-label {
+  margin: 0;
+  font-size: clamp(19px, 1.9vw, 28px);
+  font-weight: 600;
+  line-height: 1.14;
+  letter-spacing: -0.018em;
+}
+.item-org {
+  margin: 10px 0 0;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+.item-when {
+  margin: 5px 0 0;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  opacity: 0.55;
+}
+.act-cream .item-org { color: var(--ink-dim); }
+.act-ink .item-org { color: var(--cream-dim); }
+
+.item-lines { margin: 0; padding: 0; list-style: none; min-width: 0; }
+.item-lines li {
+  position: relative;
+  padding-left: 22px;
+  margin-bottom: 13px;
+  font-size: clamp(14px, 1.1vw, 16.5px);
+  line-height: 1.5;
+}
+.act-cream .item-lines li { color: var(--ink-dim); }
+.act-ink .item-lines li { color: var(--cream-dim); }
+.item-lines li::before {
+  content: ""; position: absolute; left: 0; top: 0.62em;
+  width: 10px; height: 1px; background: currentColor; opacity: 0.5;
+}
+.item-lines li:last-child { margin-bottom: 0; }
+
+/* =============================================================  stats */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  border-top: 1px solid var(--rule);
+  border-left: 1px solid var(--rule);
+}
+.act-ink .stat-grid { border-color: var(--rule-dark); }
+.stat {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: clamp(20px, 3vw, 36px);
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.act-ink .stat { border-color: var(--rule-dark); }
+.stat-value {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 4.6vw, 68px);
+  line-height: 0.86;
+  letter-spacing: -0.035em;
+}
+.stat-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  line-height: 1.4;
+}
+.act-cream .stat-label { color: var(--ink-dim); }
+.act-ink .stat-label { color: var(--cream-dim); }
+
+/* =============================================================  stack */
+.stack-groups {
+  display: grid;
+  gap: clamp(28px, 4vh, 52px);
+  border-top: 1px solid var(--rule);
+  padding-top: clamp(26px, 3.6vh, 46px);
+}
+.act-ink .stack-groups { border-color: var(--rule-dark); }
+.stack-group {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+  gap: clamp(14px, 3vw, 48px);
+  align-items: start;
+}
+.stack-name {
+  margin: 0;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+}
+.tag-cloud { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+.tag {
+  padding: 6px 12px;
+  border: 1px solid var(--rule);
+  font-size: 12px; font-weight: 500;
+  transition: background .22s ease, color .22s ease;
+}
+.act-ink .tag { border-color: var(--rule-dark); }
+.act-cream .tag:hover { background: var(--ink); color: var(--cream); }
+.act-ink .tag:hover { background: var(--cream); color: var(--ink); }
+
+/* ============================================================  quotes */
+.act-quote {
+  background: var(--cream);
+  color: var(--ink);
+  padding: clamp(110px, 20vh, 260px) 0;
+}
+.quote { margin: 0; }
+.quote-text {
+  max-width: 20ch;
+  font-size: clamp(34px, 7vw, 118px);
+  line-height: 0.86;
+  margin-bottom: 0;
+}
+.quote-attrib {
+  margin-top: clamp(20px, 3vh, 36px);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+/* ===========================================================  contact */
+.contact-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  border-top: 1px solid var(--rule-dark);
+  border-left: 1px solid var(--rule-dark);
+  margin-bottom: clamp(30px, 5vh, 56px);
+}
+.contact-link {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: clamp(20px, 2.6vw, 34px);
+  border-right: 1px solid var(--rule-dark);
+  border-bottom: 1px solid var(--rule-dark);
+  transition: background .25s ease, color .25s ease;
+}
+.contact-link:hover { background: var(--cream); color: var(--ink); }
+.contact-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  opacity: 0.6;
+}
+.contact-value {
+  font-size: clamp(15px, 1.35vw, 19px);
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.rewind-btn {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 15px 26px;
+  border: 1px solid var(--rule-dark);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  transition: background .25s ease, color .25s ease;
+}
+.rewind-btn::before { content: "\25C0\25C0"; letter-spacing: 0; }
+.rewind-btn:hover { background: var(--cream); color: var(--ink); }
+
+/* ====================================================  the tool trail */
+/*  The inverting spotlight.
+
+    White + mix-blend-mode: difference returns the inverse of whatever
+    is beneath, so the disc shows the page's negative — cream becomes
+    ink, ink becomes cream, and the display type reads in reverse as it
+    passes. One element, correct on every ground, with no need to know
+    which act it is over. */
+.cursor-spot {
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 95;
+  width: var(--size, 104px);
+  height: var(--size, 104px);
+  background: #FFFFFF;
+  border-radius: 50% !important;   /* the one exception to the square rule */
+  mix-blend-mode: difference;
+  pointer-events: none;
+  transition: width .34s cubic-bezier(.16,1,.3,1),
+              height .34s cubic-bezier(.16,1,.3,1),
+              opacity .22s ease;
+}
+.cursor-spot.is-link { width: 168px; height: 168px; }
+.cursor-spot.is-down { width: 76px; height: 76px; }
+.cursor-spot.is-away { opacity: 0; }
+
+/*  The disc lags on purpose, which is exactly why this exists: the dot
+    sits on the true pointer position so links can still be aimed at. */
+.cursor-dot {
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 96;
+  width: var(--dot, 6px);
+  height: var(--dot, 6px);
+  background: #FFFFFF;
+  border-radius: 50% !important;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  transition: opacity .22s ease;
+}
+.cursor-dot.is-away { opacity: 0; }
+
+/* =========================================================  tool logos */
+/*  Requested from the Simple Icons CDN in white; the cream acts invert
+    them to black. One asset, both grounds. */
+.tool-logo {
+  width: 1em; height: 1em;
+  display: block;
+  flex: none;
+  object-fit: contain;
+}
+
+/*  Two kinds of source, so two treatments.
+
+    Simple Icons is fetched already black, so on the cream acts it needs
+    nothing and on the ink acts it just inverts.
+
+    svgl and favicons arrive in full colour. They are flattened to a
+    silhouette — grayscale, then crushed — so a wall of marks from three
+    different sources still reads as one set rather than a sticker
+    sheet. `contrast` before `brightness` keeps the shape from filling
+    in solid. */
+.tool-logo[data-mono="1"] { filter: none; }
+.act-ink .tool-logo[data-mono="1"] { filter: invert(1); }
+
+/*  Desaturate only — no brightness crush.
+    Crushing turned every favicon that ships an OPAQUE background into a
+    black blob (Schema.org, Higgsfield, Screaming Frog all did this).
+    Plain grayscale keeps a light-backed favicon light with its mark
+    dark, which is what actually reads on cream. */
+.tool-logo[data-mono="0"] {
+  filter: grayscale(1) contrast(1.08);
+}
+.act-ink .tool-logo[data-mono="0"] {
+  filter: grayscale(1) contrast(1.08) invert(1);
+}
+
+/*  A cell with no brand mark sets its name a little larger and centres
+    it, so the grid keeps an even rhythm instead of showing a gap where
+    an icon would have been. */
+.logo-cell.no-mark .logo-name {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  opacity: 1;
+}
+.act-cream .logo-cell.no-mark .logo-name { color: var(--ink); }
+.act-ink .logo-cell.no-mark .logo-name { color: var(--cream); }
+
+.marquee-logo { width: clamp(18px, 2.1vw, 32px); height: clamp(18px, 2.1vw, 32px); }
+
+/* ----------------------------------------------------------  the wall */
+.logo-wall-label {
+  margin: clamp(30px, 5vh, 58px) 0 clamp(16px, 2.4vh, 26px);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+}
+.act-cream .logo-wall-label { color: var(--ink-dim); }
+.act-ink .logo-wall-label { color: var(--cream-dim); }
+
+.logo-wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(50%, 158px), 1fr));
+  border-top: 1px solid var(--rule);
+  border-left: 1px solid var(--rule);
+  margin-bottom: clamp(32px, 5vh, 62px);
+}
+.act-ink .logo-wall { border-color: var(--rule-dark); }
+
+.logo-cell {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px;
+  padding: clamp(20px, 2.6vw, 32px) 12px;
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  text-align: center;
+  transition: background .26s ease, color .26s ease;
+}
+.act-ink .logo-cell { border-color: var(--rule-dark); }
+.logo-cell .tool-logo { width: clamp(22px, 2.4vw, 30px); height: clamp(22px, 2.4vw, 30px); }
+.logo-name {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  line-height: 1.3;
+}
+.act-cream .logo-name { color: var(--ink-dim); }
+.act-ink .logo-name { color: var(--cream-dim); }
+
+.act-cream .logo-cell:hover { background: var(--ink); color: var(--cream); }
+.act-cream .logo-cell:hover .tool-logo[data-mono="1"] { filter: invert(1); }
+.act-cream .logo-cell:hover .tool-logo[data-mono="0"] { filter: grayscale(1) contrast(1.08) invert(1); }
+.act-cream .logo-cell:hover .logo-name { color: inherit; opacity: 0.75; }
+.act-ink .logo-cell:hover { background: var(--cream); color: var(--ink); }
+.act-ink .logo-cell:hover .tool-logo[data-mono="1"] { filter: none; }
+.act-ink .logo-cell:hover .tool-logo[data-mono="0"] { filter: grayscale(1) contrast(1.08); }
+.act-ink .logo-cell:hover .logo-name { color: inherit; opacity: 0.75; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-spot, .cursor-dot { display: none; }
+  body.has-pointer, body.has-pointer * { cursor: auto; }
+  .logo-cell { transition: none; }
+}
+
+/* =====================================================================
+   ASK — the assistant, in this site's language.
+
+   Deliberately not chat bubbles. Rounded pastel bubbles are a product
+   UI and would be the one thing on the page that looks borrowed. This
+   is a ruled transcript: a speaker label, a rule, the text. Same
+   hairlines and same 11px/600 uppercase as everything else.
+   ===================================================================== */
+
+.act-ask .frame { max-width: 980px; }
+
+.ask-chips {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: clamp(22px, 3.4vh, 34px);
+}
+.ask-chip {
+  padding: 9px 14px;
+  border: 1px solid var(--rule-dark);
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .24s ease, color .24s ease;
+}
+.ask-chip:hover { background: var(--cream); color: var(--ink); }
+
+/* ------------------------------------------------------  transcript */
+.ask-log {
+  max-height: 46vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-top: 1px solid var(--rule-dark);
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule-dark) transparent;
+}
+.ask-log::-webkit-scrollbar { width: 6px; }
+.ask-log::-webkit-scrollbar-thumb { background: var(--rule-dark); }
+
+.ask-row {
+  padding: clamp(16px, 2.4vh, 24px) 0;
+  border-bottom: 1px solid var(--rule-dark);
+}
+.ask-who {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--cream-dim);
+}
+.ask-row.is-user .ask-who { color: var(--cream); }
+.ask-text {
+  margin: 0;
+  font-size: clamp(15px, 1.2vw, 18px);
+  line-height: 1.55;
+}
+.ask-row.is-user .ask-text { font-weight: 600; }
+.ask-row.is-bot .ask-text { color: var(--cream-dim); }
+
+.ask-text.is-thinking { opacity: 0.5; }
+.ask-text.is-thinking::after {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  animation: ask-dots 1.4s steps(4, end) infinite;
+}
+@keyframes ask-dots {
+  0%   { content: ""; }
+  25%  { content: "."; }
+  50%  { content: ".."; }
+  75%  { content: "..."; }
+}
+
+/* ---------------------------------------------------------  sources */
+/*  The passages behind an answer. This is the trust mechanism — an
+    answer you cannot check is just a confident voice — so it stays
+    one click away rather than buried. */
+.ask-sources { margin-top: 14px; }
+.ask-sources-toggle {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--cream-dim);
+  font: inherit;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  cursor: pointer;
+  transition: color .2s ease;
+}
+.ask-sources-toggle::before { content: "\25B8  "; }
+.ask-sources-toggle.is-open::before { content: "\25BE  "; }
+.ask-sources-toggle:hover { color: var(--cream); }
+
+.ask-sources-list {
+  margin-top: 12px;
+  border-top: 1px solid var(--rule-dark);
+}
+.ask-source {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule-dark);
+}
+.ask-source-head {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px;
+  margin-bottom: 6px;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+.ask-source-n { color: var(--cream); }
+.ask-source-title { color: var(--cream-dim); }
+.ask-source-meta { color: var(--cream-dim); opacity: 0.6; margin-left: auto; }
+.ask-source-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--cream-dim);
+}
+
+.ask-note, .ask-disclaimer {
+  margin: 10px 0 0;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--cream-dim);
+  opacity: 0.7;
+}
+
+/* -----------------------------------------------------------  input */
+.ask-form {
+  display: flex; align-items: stretch; gap: 0;
+  margin-top: clamp(20px, 3vh, 30px);
+  border-bottom: 1px solid var(--cream);
+}
+.ask-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 16px 0;
+  border: 0;
+  background: none;
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: clamp(15px, 1.3vw, 19px);
+  font-weight: 500;
+}
+.ask-input::placeholder { color: var(--cream-dim); opacity: 0.7; }
+.ask-input:focus { outline: none; }
+.ask-form:focus-within { border-bottom-width: 2px; }
+
+.ask-send {
+  flex: none;
+  padding: 0 clamp(20px, 2.4vw, 32px);
+  border: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity .2s ease;
+}
+.ask-send:disabled { opacity: 0.4; cursor: default; }
+
+.ask-status {
+  margin: 12px 0 0;
+  min-height: 1.2em;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--cream-dim);
+  opacity: 0.65;
+}
+
+@media (max-width: 560px) {
+  .ask-log { max-height: 58vh; }
+  .ask-source-meta { margin-left: 0; width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-text.is-thinking::after { animation: none; content: "…"; }
+  .ask-chip, .ask-send, .ask-sources-toggle { transition: none; }
+}
+
+/* =====================================================================
+   THE ASSISTANT — launcher avatar + docked panel
+   The avatar is ORIGINAL, drawn in this site's language. It is not
+   Grok's mark or any other product's: a real AI company's logo on a
+   personal portfolio implies an association that does not exist.
+   ===================================================================== */
+
+.bot-launcher {
+  position: fixed;
+  right: clamp(16px, 2.4vw, 34px);
+  bottom: clamp(16px, 2.4vw, 34px);
+  z-index: 92;
+  width: clamp(58px, 5vw, 68px);
+  height: clamp(58px, 5vw, 68px);
+  display: grid; place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50% !important;   /* the chat convention, deliberately */
+  background: var(--cream);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 0 0 1px var(--ink), 0 0 0 2px rgba(251, 244, 230, 0.28);
+  transition: transform .32s cubic-bezier(.16,1,.3,1),
+              background .24s ease, color .24s ease;
+  animation: bot-in 620ms cubic-bezier(.16,1,.3,1) 1100ms both;
+}
+.bot-launcher:hover { transform: scale(1.07); }
+.bot-launcher:active { transform: scale(0.95); }
+@keyframes bot-in {
+  from { opacity: 0; transform: scale(0.3) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.bot-launcher > svg { position: absolute; width: 62%; height: 62%; }
+.bot-mark { transition: opacity .22s ease, transform .32s cubic-bezier(.16,1,.3,1); }
+.bot-close { opacity: 0; transform: rotate(-90deg); transition: opacity .22s ease, transform .32s cubic-bezier(.16,1,.3,1); }
+.bot-launcher.is-open .bot-mark { opacity: 0; transform: rotate(90deg); }
+.bot-launcher.is-open .bot-close { opacity: 1; transform: rotate(0deg); }
+
+/*  Three arcs at different rates around a core that breathes. Reads as
+    "thinking" with no face and no gradient — differential rotation is
+    the cheapest way to make a static mark feel alive. */
+.bot-arc { transform-origin: 50% 50%; }
+.bot-arc-1 { animation: bot-spin 7s linear infinite; }
+.bot-arc-2 { animation: bot-spin 4.6s linear infinite reverse; }
+.bot-arc-3 { animation: bot-spin 3.1s linear infinite; }
+.bot-core  { animation: bot-breathe 2.8s ease-in-out infinite; transform-origin: 50% 50%; }
+@keyframes bot-spin { to { transform: rotate(360deg); } }
+@keyframes bot-breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(0.72); opacity: 0.75; }
+}
+/* While a question is in flight the whole mark accelerates. */
+.bot-launcher.is-busy .bot-arc-1 { animation-duration: 1.6s; }
+.bot-launcher.is-busy .bot-arc-2 { animation-duration: 1.1s; }
+.bot-launcher.is-busy .bot-arc-3 { animation-duration: 0.8s; }
+
+.bot-pulse {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 8px; height: 8px;
+  border-radius: 50% !important;
+  background: var(--ink);
+  animation: bot-pulse 2.4s ease-in-out infinite;
+}
+@keyframes bot-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+/*  Nobody clicks a mystery circle. One label, removed the moment the
+    panel is opened for the first time. */
+.bot-tip {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 9px 13px;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  white-space: nowrap;
+  animation: bot-tip-in 500ms cubic-bezier(.16,1,.3,1) 2200ms both;
+}
+@keyframes bot-tip-in { from { opacity: 0; transform: translateY(-50%) translateX(10px); } }
+
+/* -----------------------------------------------------------  panel */
+.bot-panel {
+  position: fixed;
+  z-index: 91;
+  right: clamp(12px, 2vw, 28px);
+  bottom: calc(clamp(16px, 2.4vw, 34px) + clamp(58px, 5vw, 68px) + 14px);
+  width: min(430px, calc(100vw - 24px));
+  max-height: min(620px, calc(100vh - 140px));
+  display: flex; flex-direction: column;
+  background: var(--ink);
+  border: 1px solid var(--cream);
+  opacity: 0;
+  transform: translateY(16px) scale(0.98);
+  transform-origin: 100% 100%;
+  pointer-events: none;
+  transition: opacity .3s ease, transform .34s cubic-bezier(.16,1,.3,1);
+}
+body.bot-open .bot-panel {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.bot-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--rule-dark);
+  flex: none;
+}
+.bot-ident { display: flex; align-items: center; gap: 12px; color: var(--cream); }
+.bot-ident svg { width: 30px; height: 30px; flex: none; }
+.bot-ident-text { display: flex; flex-direction: column; gap: 2px; }
+.bot-name {
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase;
+}
+.bot-sub { font-size: 11px; color: var(--cream-dim); }
+
+.bot-close-btn {
+  padding: 7px 12px;
+  border: 1px solid var(--rule-dark);
+  background: none;
+  color: var(--cream-dim);
+  font: inherit;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  cursor: pointer;
+  transition: background .22s ease, color .22s ease;
+}
+.bot-close-btn:hover { background: var(--cream); color: var(--ink); }
+
+.bot-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 18px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule-dark) transparent;
+}
+.bot-body::-webkit-scrollbar { width: 6px; }
+.bot-body::-webkit-scrollbar-thumb { background: var(--rule-dark); }
+
+.bot-foot {
+  flex: none;
+  padding: 12px 18px 16px;
+  border-top: 1px solid var(--rule-dark);
+}
+.bot-foot .ask-form { margin-top: 0; }
+.bot-foot .ask-status { margin-top: 8px; }
+
+/* The panel is narrow, so the transcript tightens up inside it. */
+.bot-panel .ask-log { max-height: none; overflow: visible; border-top: 0; }
+.bot-panel .ask-row { padding: 14px 0; }
+.bot-panel .ask-text { font-size: 14px; line-height: 1.55; }
+.bot-panel .ask-chips { margin: 4px 0 0; }
+.bot-panel .ask-chip { font-size: 11px; padding: 7px 11px; }
+.bot-panel .ask-input { font-size: 14px; padding: 12px 0; }
+.bot-panel .ask-send { padding: 0 18px; }
+
+@media (max-width: 560px) {
+  .bot-panel {
+    right: 8px; left: 8px;
+    width: auto;
+    max-height: calc(100vh - 150px);
+  }
+  .bot-tip { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bot-launcher, .bot-tip { animation: none; }
+  .bot-arc, .bot-core, .bot-pulse { animation: none; }
+  .bot-launcher, .bot-panel, .bot-mark, .bot-close { transition: none; }
+}
+
+/* =====================================================================
+   SCROLL DEVICES + HOVER
+   Restored — an earlier index-based edit removed this whole block by
+   accident. Taken from the reference's actual mechanics: `sticky top-0`,
+   a linear marquee, a popped-in badge, 150ms hover transitions.
+   ===================================================================== */
+
+/* ----------------------------------------------------  sticky eyebrow */
+/*  The section label rides down and parks under the nav until its
+    section ends. It only works because the page is in normal flow — a
+    transformed ancestor would give sticky nothing to stick to. */
+.eyebrow-wrap {
+  position: sticky;
+  top: clamp(52px, 8vh, 74px);
+  z-index: 10;
+  margin-bottom: clamp(20px, 3.2vh, 40px);
+  pointer-events: none;
+}
+.act-ink .eyebrow-wrap   { background: var(--ink); }
+.act-cream .eyebrow-wrap,
+.act-quote .eyebrow-wrap { background: var(--cream); }
+.eyebrow-wrap .eyebrow { margin: 0; padding: 10px 0; }
+.act-hero .eyebrow-wrap { position: static; background: none; }
+
+/* ---------------------------------------------------------  marquee */
+.marquee-act {
+  padding: clamp(22px, 3.4vh, 40px) 0;
+  overflow: hidden;
+  border-top: 1px solid var(--rule-dark);
+  border-bottom: 1px solid var(--rule-dark);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  /* Linear, always. Any easing shows the wrap as a stutter. */
+  animation: marquee 46s linear infinite;
+}
+.marquee-run { display: flex; align-items: center; }
+.marquee-item {
+  display: flex; align-items: center; gap: clamp(10px, 1.2vw, 18px);
+  white-space: nowrap;
+}
+.marquee-word {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.6vw, 40px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.marquee-dot {
+  padding: 0 clamp(16px, 2vw, 34px);
+  font-size: clamp(18px, 2.2vw, 32px);
+  opacity: 0.4;
+}
+/*  Two identical runs, so -50% lands the seam on a copy of the first
+    frame and the loop is invisible. */
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+.marquee-act:hover .marquee-track { animation-play-state: paused; }
+
+/* -----------------------------------------------------------  badge */
+.badge {
+  position: fixed;
+  /* Bottom-LEFT: the assistant launcher owns the right corner now, and
+     two floating circles in one corner is a pile, not a layout. */
+  left: clamp(16px, 2.4vw, 38px);
+  bottom: clamp(16px, 2.4vw, 38px);
+  z-index: 85;
+  width: clamp(84px, 8vw, 116px);
+  height: clamp(84px, 8vw, 116px);
+  display: grid; place-items: center;
+  color: var(--cream);
+  mix-blend-mode: difference;
+  /*  Hidden over the hero. It collided with the sub-line there, and the
+      hero already has its own call to action — a persistent CTA does not
+      need to compete with the first screen. It arrives once you scroll. */
+  opacity: 0;
+  transform: scale(0.4) rotate(-40deg);
+  pointer-events: none;
+  transition: opacity .5s ease, transform .6s cubic-bezier(.16, 1, .3, 1);
+}
+body.is-scrolled .badge {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.badge-ring {
+  width: 100%; height: 100%;
+  animation: badge-spin 18s linear infinite;
+}
+.badge-ring text {
+  fill: currentColor;
+  font-family: var(--font-body);
+  font-size: 9.2px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.badge-dot { position: absolute; width: 7px; height: 7px; background: currentColor; }
+.badge:hover .badge-ring { animation-duration: 6s; }
+@keyframes badge-spin { to { transform: rotate(360deg); } }
+
+/* ------------------------------------------------------  row hover */
+/*  A ruled row fills from the left and inverts. Nothing shifts — the
+    reference never nudges layout on hover. */
+.item { position: relative; isolation: isolate; }
+.item::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(var(--gutter) * -0.5);
+  z-index: -1;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform .3s cubic-bezier(.16, 1, .3, 1);
+}
+/*  Explicit colours, NOT currentColor. currentColor changes on hover —
+    the fill would resolve to the value the text just became and vanish
+    against its own background. */
+.act-cream .item::before { background: var(--ink); }
+.act-ink   .item::before { background: var(--cream); }
+.item:hover::before { transform: scaleX(1); }
+.act-cream .item:hover { color: var(--cream); }
+.act-ink   .item:hover { color: var(--ink); }
+/*  Matched to the sweep so text and fill arrive together. */
+.item, .item * { transition: color .3s cubic-bezier(.16, 1, .3, 1); }
+.item:hover .item-org,
+.item:hover .item-when,
+.item:hover .item-lines li { color: inherit; opacity: 0.82; }
+
+/* --------------------------------------------------  underline sweep */
+/*  The reference transitions `width` over 0.3s — a rule that grows from
+    the left, not a fade. */
+.contact-link { position: relative; }
+.contact-link::after {
+  content: "";
+  position: absolute;
+  left: clamp(20px, 2.6vw, 34px);
+  bottom: clamp(16px, 2.2vw, 28px);
+  height: 1px; width: 0;
+  background: currentColor;
+  transition: width .3s cubic-bezier(.4, 0, .2, 1);
+}
+.contact-link:hover::after { width: 34px; }
+
+.nav-link { position: relative; }
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -4px;
+  height: 1px; width: 0;
+  background: currentColor;
+  transition: width .3s cubic-bezier(.4, 0, .2, 1);
+}
+.nav-link:hover::after { width: 100%; }
+
+/* --------------------------------------------------------  stat hover */
+.stat { transition: background .28s ease, color .28s ease; }
+.act-cream .stat:hover { background: var(--ink); color: var(--cream); }
+.act-ink   .stat:hover { background: var(--cream); color: var(--ink); }
+.stat:hover .stat-label { color: inherit; opacity: 0.72; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track, .badge-ring { animation: none; }
+  .badge { transition: none; }
+  .eyebrow-wrap { position: static; }
+  .item::before { display: none; }
+  .item, .item *, .stat, .contact-link, .nav-link,
+  .contact-link::after, .nav-link::after { transition: none; }
+}

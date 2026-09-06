@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Ramakrishnan S — Résumé</title>
+<style>
+  @page { size: A4; margin: 12mm 13mm; }
+  * { box-sizing: border-box; }
+  /* State the light scheme and the white ground explicitly. Without
+     these the page inherits the reader's dark mode, and near-black body
+     text on a dark ground is unreadable — which is what anyone opening
+     resume-print.html in a dark browser actually saw. */
+  html { color-scheme: light; background: #ffffff; }
+  body {
+    background: #ffffff;
+    margin: 0;
+    font: 9.5pt/1.42 "Calibri", "Segoe UI", system-ui, sans-serif;
+    color: #14161a;
+    -webkit-print-color-adjust: exact;
+    /* No ligatures. Calibri draws fi, fl and ff as single glyphs, and a
+       parser reading the PDF then gets "qualiﬁed" and "workﬂows" —
+       which no keyword search for "qualified" or "workflow" will ever
+       match. This one line is the difference between being found and
+       not. */
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "clig" 0, "dlig" 0, "hlig" 0;
+  }
+  a { color: #14161a; text-decoration: none; }
+
+  header { border-bottom: 1.6pt solid #14161a; padding-bottom: 5pt; margin-bottom: 9pt; }
+  h1 { margin: 0; font-size: 18pt; letter-spacing: .2pt; }
+  .tagline { margin: 2pt 0 4pt; font-size: 9.4pt; font-weight: 600; color: #3d444d; }
+  .contact { font-size: 8.6pt; color: #3d444d; }
+  .contact span + span::before { content: "  ·  "; color: #9aa2ab; }
+
+  h2 {
+    font-size: 8.3pt; text-transform: uppercase; letter-spacing: 1.1pt;
+    margin: 8pt 0 3pt; padding-bottom: 2pt;
+    border-bottom: .6pt solid #c8cdd3; color: #14161a;
+  }
+  section:first-of-type h2 { margin-top: 6pt; }
+
+  .summary { margin: 0; text-align: justify; }
+
+  .role { margin-bottom: 5.5pt; page-break-inside: avoid; }
+  .role-head { display: flex; justify-content: space-between; gap: 8pt; align-items: baseline; }
+  .role-title { font-weight: 700; font-size: 9.8pt; }
+  .role-org { font-weight: 600; color: #3d444d; }
+  .role-when { font-size: 8.4pt; color: #5b636d; white-space: nowrap; }
+
+  ul { margin: 2pt 0 0; padding-left: 12pt; }
+  li { margin-bottom: 1.1pt; text-align: justify; }
+
+  .proj { margin-bottom: 5pt; page-break-inside: avoid; }
+  .proj-name { font-weight: 700; }
+  .proj-sub { color: #5b636d; font-size: 8.6pt; }
+
+  /* Two columns per line, so a wrapped list lines up under itself rather
+     than running back to the margin. Done with flex rather than a
+     negative text-indent: inside a flex item the negative indent pulls
+     the label outside the box and it gets clipped away entirely. */
+  .skills p { display: flex; gap: 5pt; margin: 0 0 3.5pt; }
+  .skills b { flex: 0 0 44pt; }
+  .skills span { flex: 1 1 auto; }
+
+  /* Deliberately NOT two columns any more. Side by side, the extracted
+     text came out as "SKILLS EDUCATION" on one line with the two
+     sections interleaved underneath, so a parser could not tell which
+     heading owned what. A CV is read by a machine before a human; one
+     column top to bottom is the only reading order both agree on. */
+  .two { display: block; }
+  .two > div + div { margin-top: 2pt; }
+</style></head><body>
+
+<header>
+  <h1>Ramakrishnan S</h1>
+  <p class="tagline">AI-Driven Digital Marketing | SEO, AEO &amp; GEO | Content Strategy &amp; Marketing Automation</p>
+  <div class="contact">
+    <span>Chennai, Tamil Nadu</span><span>ramakrishnan15126@gmail.com</span><span>+91 8124806650</span>
+    <span>linkedin.com/in/ramakrishnan15126</span><span>github.com/ram15126</span>
+  </div>
+</header>
+
+<section>
+  <h2>Summary</h2>
+  <p class="summary">Marketing Management undergraduate (B.Com, 2027) running three concurrent roles — agency leadership, SEO and content strategy, and remote B2B SaaS demand generation. Audited 13 brands across 500+ URLs. Leads a 10-member team. Builds marketing tools by specifying the system, directing the build, and verifying every output.</p>
+</section>
+
+<section>
+  <h2>Experience</h2>
+  <div class="role">
+      <div class="role-head">
+        <div><span class="role-title">Co-Founder</span> — <span class="role-org">NeoArk Digital</span>, Chennai, Tamil Nadu</div>
+        <div class="role-when">Jan 2026 – Present</div>
+      </div>
+      <ul><li>Lead a 10-member team across concurrent client accounts — delegation, quality review and delivery.</li><li>Built an outbound engine (ICP, 7-filter funnel, area x niche grid) that sourced and qualified 104 B2B leads across 4 funnels.</li><li>Ran a marketplace launch end to end: market research, brand book, 30-day content calendar, LinkedIn kit and six carousels.</li><li>Set the brand's positioning law and encoded it as an automated copy gate that blocks publishing on a banned-word fail.</li><li>Audited a client's shipped app against agreed positioning and halted the creative when the product contradicted it.</li><li>Trained non-technical team members to independent delivery in AI fluency, agency process and AI-assisted builds.</li></ul>
+    </div><div class="role">
+      <div class="role-head">
+        <div><span class="role-title">Marketing &amp; SEO Intern</span> — <span class="role-org">Siva Comics</span>, Chennai, Tamil Nadu</div>
+        <div class="role-when">Jun 2026 – Present</div>
+      </div>
+      <ul><li>Ran SEO, AEO and GEO audits across 13 brands and 500+ URLs, every finding shipped with a reproducible verification step.</li><li>Specified 17 prioritised findings for an e-commerce client; client-side implementation moved site health 43 to 65.</li><li>Withdrew a finished report hours before release after catching five extraction artefacts, then documented 14 false-positive categories.</li><li>Directed a 2-minute AI-generated heritage film for a global IT services client: 24 shots, 38 clips, 17 cuts, two review calls.</li><li>Built topical maps, content briefs and 30-day editorial plans; authored AI-citation plans, answer blocks and llms.txt.</li><li>Built a 30-day Instagram content system and manage social pages for multiple brands.</li></ul>
+    </div><div class="role">
+      <div class="role-head">
+        <div><span class="role-title">Marketing Intern</span> — <span class="role-org">Digimabble</span>, Belgium (Remote)</div>
+        <div class="role-when">Jan 2026 – Present</div>
+      </div>
+      <ul><li>Drive demand generation for Greenlane AI, a healthcare B2B SaaS product sold to doctors and private practices.</li><li>Run the product's LinkedIn programme end to end: positioning, planning, copywriting and publishing.</li><li>Write and run cold email sequences to medical practices — list building, segmentation, copy and follow-up.</li><li>Research competitor positioning and audience segments to inform content strategy and messaging.</li><li>Deploy AI workflows that shorten research and content production cycles.</li></ul>
+    </div>
+</section>
+
+<section>
+  <h2>Selected projects</h2>
+  <div class="proj">
+      <div><span class="proj-name">Multi-Brand SEO / AEO / GEO Agent System</span> <span class="proj-sub">— Claude Code skill · 1 router, 37 playbooks, 78 collectors</span></div>
+      <ul><li>Merged four open-source SEO repos into one auto-triggering router that loads exactly one playbook per request.</li><li>Every finding is labelled Confirmed, Likely or Unverified, so client reports carry only measured claims.</li></ul>
+    </div><div class="proj">
+      <div><span class="proj-name">Free Website SEO Audit Tool</span> <span class="proj-sub">— Shipped on a client Next.js site</span></div>
+      <ul><li>Public lead-gen tool auditing any URL a visitor submits — titles, headings, canonicals, alt text, schema, security headers.</li><li>Hardened against SSRF with per-hop redirect validation and fail-closed rate limiting; verified by a 98-test suite.</li></ul>
+    </div><div class="proj">
+      <div><span class="proj-name">Rocket Carousel Maker</span> <span class="proj-sub">— AI carousel generator</span></div>
+      <ul><li>Generates brand-ready carousels from structured prompts, with per-brand design systems and PNG, PDF and ZIP export.</li><li>86 render-verified decks and 361 slides; headless checks reject any slide that overflows, wraps or overlaps.</li></ul>
+    </div><div class="proj">
+      <div><span class="proj-name">The State of Chennai SME Websites 2026</span> <span class="proj-sub">— Original research · OpenStreetMap / Overpass API</span></div>
+      <ul><li>Sampled 161 Chennai businesses from OpenStreetMap and audited 125, after discarding a web-search sample that returned three other continents.</li><li>Published under CC BY 4.0 with Dataset schema; aggregate findings only, and four sites that disallowed crawling were excluded.</li></ul>
+    </div><div class="proj">
+      <div><span class="proj-name">Seven Reusable AI Skills</span> <span class="proj-sub">— Claude Code skills built from processes run manually first</span></div>
+      <ul><li>A 30-day content engine, a carousel studio with an anti-slop gate, a lead-gen engine, a prompt router and a teaching skill.</li><li>Each encodes rules learned from real corrections rather than from a template.</li></ul>
+    </div><div class="proj">
+      <div><span class="proj-name">AI Video Editor</span> <span class="proj-sub">— Prompt-based terminal video editor</span></div>
+      <ul><li>Edits video from natural-language prompts instead of a timeline — effects, transitions, subtitles, overlays and multi-clip assembly.</li><li>Covers animatics, contact sheets and automatic transcription for subtitles.</li></ul>
+    </div>
+</section>
+
+<div class="two">
+  <div>
+    <section class="skills">
+      <h2>Skills</h2>
+      <p><b>Marketing</b><span>SEO / AEO / GEO, Content Strategy, Demand Generation, Keyword Research, GA4 &amp; Search Console</span></p><p><b>AI</b><span>AI Agent Orchestration, Claude Code / Codex / Cursor, Prompt &amp; Context Engineering, n8n &amp; MCP Workflows, Generative Video Production</span></p><p><b>Leadership</b><span>Team Leadership, Client Communication, Coaching &amp; Mentoring, Learning Agility, Stakeholder Reporting</span></p>
+    </section>
+  </div>
+  <div>
+    <section>
+      <h2>Education</h2>
+      <div class="role-head">
+        <div><span class="role-title">B.Com, Marketing Management</span></div>
+        <div class="role-when">2024 – 2027 (Expected)</div>
+      </div>
+      <div class="role-org">D.G. Vaishnav College, Chennai, Tamil Nadu</div>
+      <p style="margin:3pt 0 0">Coursework: Marketing Management, Brand Management, International Marketing, CRM, Entrepreneurship, Consumer Behavior.</p>
+    </section>
+    <section>
+      <h2>Training &amp; languages</h2>
+      <p style="margin:0">Digital Marketing Workshop · Design Thinking Workshop · Social Media Marketing Workshop · Meta Ads &amp; Performance Marketing Training</p>
+      <p style="margin:2pt 0 0">Languages: English, Tamil</p>
+    </section>
+  </div>
+</div>
+
+<!-- Generated from config/content.js on 2026-09-06.
+     Kept as a comment, not a footer: a build note printed on the page
+     meant nothing to a recruiter and cost a line of the CV. -->
+</body></html>

@@ -1,0 +1,1625 @@
+/* =====================================================================
+   RAM 06 — Windows XP "Luna", in CSS.
+
+   All colours come from config/theme.js as custom properties, so this
+   file never hard-codes a palette value.
+
+   The thing to understand: 98 built everything from 2px bevels — a light
+   edge top-left, a dark one bottom-right. XP threw that out. Its whole
+   look is three other tricks, used everywhere:
+
+     1. VERTICAL GRADIENTS. A bright gloss line at the top, deepest
+        through the middle, lifting again at the bottom edge.
+     2. ROUNDED CORNERS. Title bars, buttons, the Start button, the
+        Start menu. Nothing is square except content wells.
+     3. A COLOURED FRAME. A window is a block of its title colour with
+        the content sitting inside it, not a grey box with a coloured
+        strip on top.
+
+   Content wells kept a 1px sunken border (#7F9DB9) rather than a bevel.
+   ===================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* `hidden` must beat every display rule below it. */
+[hidden] { display: none !important; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--desktop);
+  user-select: none;
+}
+
+body.is-dragging { cursor: move; }
+body.is-dragging * { user-select: none !important; }
+
+img { max-width: 100%; }
+.pixel-icon { display: block; }
+
+a { color: var(--link); }
+
+/* A <button> does not inherit `color` — browsers give it their own
+   default, which is invisible the moment a scheme paints the chrome
+   black. Every control states its colour. */
+button, select, input, textarea { color: var(--text); }
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible { outline: 1px dotted var(--text); outline-offset: -3px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 999;
+  background: var(--face); padding: 6px 10px;
+}
+.skip-link:focus { left: 8px; top: 8px; }
+
+/* =====================================================  boot screen  */
+/*  XP booted to black with the logo and a looping bar, not a progress
+    meter that tracked anything real. This does the same.              */
+#boot {
+  position: fixed; inset: 0; z-index: 500;
+  display: grid; place-items: center;
+  background: #000000;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: opacity .35s ease;
+}
+#boot.is-done { opacity: 0; pointer-events: none; }
+
+.boot-inner { text-align: center; padding: 24px; max-width: 460px; }
+
+.boot-logo {
+  display: grid;
+  grid-template-columns: repeat(2, 28px);
+  grid-auto-rows: 28px;
+  gap: 3px;
+  justify-content: center;
+  margin: 0 auto 24px;
+  transform: perspective(220px) rotateY(-14deg) skewY(-4deg);
+}
+.boot-logo-pane {
+  display: block;
+  background: var(--brand-logo);
+  border-radius: 2px;
+  box-shadow: inset 0 -6px 10px rgba(0,0,0,.35), inset 0 4px 6px rgba(255,255,255,.35);
+}
+.boot-logo-pane:nth-child(2),
+.boot-logo-pane:nth-child(3) { background: var(--brand-logo-dark); }
+
+.boot-name {
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: .4px;
+  margin: 0 0 6px;
+}
+.boot-role {
+  margin: 0 0 30px;
+  font-size: 12px;
+  color: #9AA4B4;
+}
+
+/*  The XP boot bar: three blocks sliding left to right inside a sunken
+    trough, looping forever. It never showed real progress and neither
+    does this — the width below is set by JS only so the animation has
+    somewhere to live.                                                  */
+.boot-bar {
+  width: 200px; height: 16px;
+  margin: 0 auto 14px;
+  background: #0B0B0B;
+  border: 1px solid #2A2A2A;
+  border-radius: 2px;
+  padding: 2px;
+  overflow: hidden;
+  position: relative;
+}
+.boot-bar-fill { display: none; }
+.boot-bar::after {
+  content: "";
+  position: absolute;
+  top: 2px; bottom: 2px; left: 0;
+  width: 42px;
+  background:
+    linear-gradient(90deg,
+      transparent 0 2px, var(--brand-logo) 2px 12px, transparent 12px 16px,
+      var(--brand-logo) 16px 26px, transparent 26px 30px,
+      var(--brand-logo) 30px 40px, transparent 40px);
+  animation: boot-slide 2s linear infinite;
+}
+@keyframes boot-slide {
+  from { transform: translateX(-46px); }
+  to   { transform: translateX(200px); }
+}
+
+.boot-hint { margin: 0; font-size: 10px; color: #55606E; }
+.boot-hint span { color: #3E4753; }
+
+@media (prefers-reduced-motion: reduce) {
+  #boot { display: none; }
+}
+
+/* ========================================================  desktop  */
+#desktop {
+  position: fixed;
+  inset: 0 0 32px 0;
+  overflow: hidden;
+  background-color: var(--desktop);
+}
+
+.icon-layer {
+  position: absolute; inset: 0;
+  padding: 8px 6px;
+  display: grid;
+  grid-template-columns: 82px;
+  grid-auto-rows: 80px;
+  grid-auto-flow: column;
+  align-content: start;
+  gap: 2px;
+  grid-template-rows: repeat(auto-fill, 80px);
+  max-height: 100%;
+  pointer-events: none;
+}
+.icon-layer > * { pointer-events: auto; }
+
+.desk-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 82px;
+  padding: 5px 3px 4px;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: var(--icon-label);
+  cursor: default;
+  text-align: center;
+}
+.desk-icon .pixel-icon {
+  filter: drop-shadow(1px 2px 2px rgba(0,0,0,.55));
+}
+.desk-icon-label {
+  display: inline-block;
+  padding: 1px 3px;
+  line-height: 1.3;
+  text-shadow: 0 1px 2px rgba(0,0,0,.85);
+  word-break: break-word;
+  border-radius: 2px;
+}
+.desk-icon.is-selected .desk-icon-label {
+  background: var(--icon-label-bg);
+  outline: 1px dotted rgba(255,255,255,.85);
+  text-shadow: none;
+}
+.desk-icon.is-selected .pixel-icon {
+  filter: drop-shadow(1px 2px 2px rgba(0,0,0,.55)) brightness(.88) saturate(1.3);
+}
+
+/* The layer covers the whole desktop, so it must not intercept clicks
+   meant for the icons underneath it — only the windows themselves do. */
+.window-layer { position: absolute; inset: 0; pointer-events: none; }
+.window-layer > * { pointer-events: auto; }
+
+/* =========================================================  window  */
+/*  An XP window IS a block of its title colour. The content sits in a
+    hole cut out of it — which is why the frame is `padding` here and
+    not a border.                                                       */
+.win {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  min-width: 240px;
+  background: var(--win-border);
+  padding: 0 4px 4px;
+  border-radius: 8px 8px 4px 4px;
+  box-shadow: 2px 4px 14px rgba(0,0,0,.4);
+}
+.win.is-maximised { border-radius: 0; padding: 0 3px 3px; }
+
+.titlebar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  margin: 0 -4px;
+  padding: 0 4px 0 6px;
+  border-radius: 7px 7px 0 0;
+  cursor: move;
+  color: var(--title-idle-text);
+  background:
+    linear-gradient(180deg,
+      var(--title-idle) 0%, var(--title-idle-to) 46%,
+      var(--title-idle) 96%, rgba(0,0,0,.12) 100%);
+}
+.win.is-maximised .titlebar { border-radius: 0; }
+
+.win.is-focused .titlebar {
+  color: var(--title-text);
+  background:
+    /* the pale wash toward the right edge */
+    linear-gradient(90deg, rgba(255,255,255,0) 60%, rgba(255,255,255,.16) 100%),
+    /* the real Luna gradient: gloss, deep, lift */
+    linear-gradient(180deg,
+      var(--title-gloss) 0%,
+      var(--title-from) 9%,
+      var(--title-mid) 42%,
+      var(--title-to) 88%,
+      var(--title-from) 100%);
+}
+
+.titlebar-icon { width: 16px; height: 16px; flex: 0 0 auto; }
+.titlebar-title {
+  display: flex; align-items: center; gap: 5px;
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: bold;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px 1px rgba(0,0,0,.45);
+}
+.titlebar-title > span { overflow: hidden; text-overflow: ellipsis; }
+.titlebar-buttons { display: flex; gap: 2px; flex: 0 0 auto; }
+
+/*  XP's caption buttons are rounded squares with their own gloss, and
+    close is red on every scheme — it never took the theme colour.      */
+.titlebar-btn {
+  width: 21px; height: 21px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.75);
+  border-radius: 3px;
+  display: grid; place-items: center;
+  cursor: default;
+  color: #FFFFFF;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,.55) 0%, rgba(255,255,255,.12) 45%,
+      rgba(0,0,0,.10) 55%, rgba(0,0,0,.22) 100%),
+    var(--title-mid);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
+}
+.titlebar-btn:hover { filter: brightness(1.22); }
+.titlebar-btn:active { filter: brightness(.85); }
+.titlebar-btn[aria-label="Close"] {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,.55) 0%, rgba(255,255,255,.12) 45%,
+      rgba(0,0,0,.10) 55%, rgba(0,0,0,.24) 100%),
+    #D5502E;
+}
+
+.glyph { display: block; position: relative; width: 9px; height: 8px; }
+.glyph-min::after {
+  content: ""; position: absolute; left: 1px; bottom: 0;
+  width: 7px; height: 2px; background: currentColor;
+}
+.glyph-max::after {
+  content: ""; position: absolute; inset: 0 0 0 0;
+  border: 1px solid currentColor; border-top-width: 2px;
+}
+.glyph-close::before, .glyph-close::after {
+  content: ""; position: absolute; left: 0; top: 3px;
+  width: 9px; height: 2px; background: currentColor; border-radius: 1px;
+}
+.glyph-close::before { transform: rotate(45deg); }
+.glyph-close::after  { transform: rotate(-45deg); }
+
+.win-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: block;
+  overflow: auto;
+  background: var(--face);
+}
+.win-body.pad { padding: 8px; }
+.win-body.col { display: flex; flex-direction: column; gap: 7px; overflow: hidden; }
+.win-body.row { display: flex; flex-direction: row; gap: 5px; overflow: hidden; padding: 5px; }
+.win-body.flat { padding: 3px; overflow: hidden; }
+.win-body.tabbed { display: flex; flex-direction: column; overflow: hidden; }
+
+.statusbar {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 3px;
+  padding: 2px 3px 3px;
+  background: var(--face);
+  border-top: 1px solid var(--shadow);
+}
+.statusbar-cell {
+  flex: 1 1 auto;
+  padding: 2px 6px;
+  min-height: 18px;
+  /* Real information, not disabled text — so it takes the normal colour. */
+  color: var(--text);
+  border: 1px solid var(--shadow);
+  border-radius: 2px;
+  background: var(--face);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.resize-grip {
+  position: absolute; right: 2px; bottom: 2px;
+  width: 14px; height: 14px;
+  cursor: nwse-resize;
+  background:
+    linear-gradient(135deg, transparent 0 46%, rgba(255,255,255,.7) 46% 54%, transparent 54% 62%,
+                    rgba(255,255,255,.7) 62% 70%, transparent 70%);
+}
+.win.is-maximised .resize-grip { display: none; }
+
+/* ==========================================================  wells  */
+/*  XP replaced the sunken bevel with a single 1px blue-grey border.   */
+.well {
+  background: var(--well);
+  color: var(--well-text);
+  padding: 11px 13px;
+  overflow: auto;
+  border: 1px solid var(--well-border);
+}
+.well.fill { flex: 1 1 auto; min-height: 0; padding: 3px; }
+
+.prose { font-size: 12px; line-height: 1.6; }
+.prose p { margin: 0 0 10px; }
+/* A maximised window is far wider than a comfortable line, so cap the
+   running text — the chrome stays full width, the reading does not. */
+.prose p, .prose li, .prose .audit-card, .prose .audit-verdict,
+.prose .audit-close, .prose .field-table { max-width: 84ch; }
+
+.prose h2.well-h {
+  font-size: 12px;
+  margin: 15px 0 7px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--well-rule);
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--well-accent);
+}
+.prose h2.well-h:first-child { margin-top: 0; }
+.prose h3.well-h.small { font-size: 11px; margin: 15px 0 6px; color: var(--well-muted); }
+.rule { border: 0; border-top: 1px solid var(--well-rule); margin: 13px 0; }
+
+.bullets { margin: 0 0 11px; padding-left: 17px; }
+.bullets li { margin-bottom: 5px; }
+
+.dim { color: var(--well-muted); }
+
+/* ---- About: the identity card ---- */
+.id-card {
+  display: flex; align-items: center; gap: 11px;
+  margin-bottom: 8px; padding: 2px;
+}
+.id-badge {
+  flex: 0 0 auto;
+  padding: 7px;
+  background: var(--well);
+  border: 1px solid var(--well-border);
+  border-radius: 3px;
+}
+.id-text { min-width: 0; }
+.id-name { margin: 0; font-size: 17px; letter-spacing: .1px; color: var(--text); }
+.id-role { margin: 3px 0 4px; font-size: 11px; font-weight: bold; color: var(--text); }
+.id-meta { margin: 0; font-size: 10px; color: var(--text-disabled); word-break: break-word; }
+
+.role-list { margin: 0 0 11px; padding-left: 17px; }
+.role-list li { margin-bottom: 4px; }
+
+/* ---- jobs and projects ---- */
+.job-head { margin-bottom: 9px; }
+.job-role { margin: 0; font-size: 13px; }
+.job-org { margin: 2px 0 0; color: var(--well-accent); }
+.job-dates { margin: 1px 0 0; font-size: 11px; color: var(--well-muted); }
+
+.proj { margin-bottom: 4px; }
+.proj-head { display: flex; gap: 9px; align-items: flex-start; margin-bottom: 7px; }
+.proj-head .pixel-icon { margin-top: 2px; flex: 0 0 auto; }
+.proj-name { margin: 0; font-size: 13px; }
+.proj-sub { margin: 1px 0 0; font-size: 11px; color: var(--well-muted); }
+.proj-link { font-size: 11px; word-break: break-all; }
+
+/* ============================================================  tabs */
+/*  XP tabs: rounded on top, the active one lifted and joined to the
+    panel below it.                                                    */
+.tabstrip {
+  display: flex;
+  gap: 2px;
+  padding-left: 4px;
+  position: relative;
+  z-index: 2;
+  flex-wrap: wrap;
+}
+.tab {
+  font: inherit;
+  font-size: 11px;
+  padding: 4px 12px 5px;
+  border: 1px solid var(--well-border);
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  cursor: default;
+  position: relative;
+  top: 1px;
+  color: var(--text);
+  background: linear-gradient(180deg, #FFFFFF 0%, var(--face) 100%);
+}
+.tab:hover { background: linear-gradient(180deg, #FFFFFF 0%, #F6F4EA 100%); }
+.tab.is-active {
+  padding: 5px 14px 7px;
+  top: 0;
+  font-weight: bold;
+  z-index: 3;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 70%, var(--well) 100%);
+}
+.tabpanels { flex: 1 1 auto; min-height: 0; display: flex; }
+.tabpanel { flex: 1 1 auto; min-height: 0; }
+.win-body.pad:has(.tabstrip) { display: flex; flex-direction: column; overflow: hidden; }
+
+/* ==========================================================  meters  */
+.meter-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 120px;
+  gap: 11px;
+  align-items: center;
+  margin-bottom: 8px;
+  max-width: 430px;
+}
+.meter-label { font-size: 12px; }
+.meter {
+  display: flex; gap: 2px;
+  padding: 2px;
+  background: var(--well);
+  border: 1px solid var(--well-border);
+  border-radius: 2px;
+}
+/*  XP progress: rounded green-glass blocks. Here they take the scheme
+    accent instead, so a red machine gets red meters.                   */
+.meter-seg {
+  flex: 1 1 0; height: 12px;
+  border-radius: 1px;
+  background: var(--well-alt);
+}
+.meter-seg.is-on {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,.65) 0%, rgba(255,255,255,.15) 45%,
+      rgba(0,0,0,.05) 55%, rgba(0,0,0,.15) 100%),
+    var(--accent);
+}
+
+.tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag {
+  font-size: 10px;
+  padding: 3px 7px;
+  background: linear-gradient(180deg, #FFFFFF 0%, var(--face) 100%);
+  color: var(--text);
+  border: 1px solid var(--shadow);
+  border-radius: 3px;
+}
+
+/* ==========================================================  fields  */
+.field-table { margin: 9px 0 13px; }
+.field-row {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 9px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.field-label { font-size: 11px; color: var(--well-muted); }
+.field-value {
+  padding: 4px 7px;
+  background: var(--well);
+  color: var(--well-text);
+  border: 1px solid var(--well-border);
+  min-height: 21px;
+  word-break: break-word;
+}
+
+/* =========================================================  buttons  */
+.toolbar { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; flex: 0 0 auto; }
+.toolbar.end { justify-content: flex-end; margin-top: 11px; }
+
+/*  The XP button: white at the top, face colour at the bottom, 3px
+    radius, thin blue-grey border. Hover lifts it and warms the edge.   */
+.btn {
+  font: inherit;
+  font-size: 11px;
+  padding: 5px 15px;
+  min-width: 76px;
+  min-height: 23px;
+  color: var(--text);
+  border: 1px solid var(--well-border);
+  border-radius: 3px;
+  cursor: default;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F3F1E7 48%, var(--face) 52%, #DEDACA 100%);
+}
+.btn:hover:not(:disabled) {
+  border-color: #E9A93B;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FBF3DF 48%, #FCEFC8 52%, #F6DFA0 100%);
+}
+.btn:active:not(:disabled) {
+  background: linear-gradient(180deg, #DEDACA 0%, #ECE9D8 100%);
+  padding: 6px 14px 4px 16px;
+}
+.btn:disabled { color: var(--text-disabled); }
+/*  The default button in an XP dialog carried a blue glow.            */
+.btn.primary {
+  font-weight: bold;
+  box-shadow: 0 0 0 1px var(--accent), 0 0 4px rgba(49,106,197,.5);
+}
+.btn.is-correct { border-color: var(--ok);  color: var(--ok);  box-shadow: 0 0 0 1px var(--ok); }
+.btn.is-wrong   { border-color: var(--bad); color: var(--bad); box-shadow: 0 0 0 1px var(--bad); }
+
+/* ============================================================  PDF  */
+.pdf-frame { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+.pdf-fallback { margin: 6px; font-size: 11px; color: var(--well-muted); text-align: center; }
+.well.fill:has(.pdf-frame) { position: relative; }
+.well.fill:has(.pdf-frame) .pdf-fallback {
+  position: absolute; left: 0; right: 0; bottom: 6px; margin: 0; z-index: -1;
+}
+
+/* ========================================================  notepad  */
+.menubar {
+  flex: 0 0 auto;
+  display: flex; gap: 1px;
+  padding: 2px 2px 4px;
+}
+.menu-item {
+  font: inherit; font-size: 11px;
+  padding: 3px 9px;
+  background: none; border: 0; cursor: default;
+  border-radius: 3px;
+}
+.menu-item:hover { background: var(--accent); color: var(--accent-text); }
+.menu-item.is-checked::before { content: "\2713  "; }
+
+.notepad-area {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  resize: none;
+  padding: 6px 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  background: var(--well);
+  color: var(--well-text);
+  border: 1px solid var(--well-border);
+  white-space: pre-wrap;
+  user-select: text;
+}
+
+/* ==========================================================  paint  */
+.paint-rail {
+  flex: 0 0 auto;
+  display: flex; flex-direction: column; gap: 4px;
+  width: 78px;
+}
+.paint-tool, .paint-size {
+  font: inherit; font-size: 11px;
+  padding: 5px 3px;
+  color: var(--text);
+  border: 1px solid var(--well-border);
+  border-radius: 3px;
+  cursor: default;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F3F1E7 48%, var(--face) 52%, #DEDACA 100%);
+}
+.paint-tool:hover, .paint-size:hover { border-color: #E9A93B; }
+.paint-tool.is-active, .paint-size.is-active {
+  font-weight: bold;
+  border-color: var(--accent);
+  background: linear-gradient(180deg, #C4D9F5 0%, #9FC0EC 100%);
+}
+.paint-sizes { display: flex; gap: 3px; }
+.paint-sizes .paint-size { flex: 1 1 0; padding: 4px 0; }
+
+.paint-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.paint-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 7px;
+  background: var(--shadow);
+  border: 1px solid var(--well-border);
+  overflow: hidden;
+}
+.paint-canvas {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  aspect-ratio: 96 / 64;
+  image-rendering: pixelated;
+  background: #fff;
+  cursor: crosshair;
+  touch-action: none;
+  box-shadow: 0 0 0 1px var(--shadow-dark);
+}
+.paint-swatches {
+  flex: 0 0 auto;
+  display: flex; flex-wrap: wrap; gap: 3px;
+  align-items: center;
+  padding: 4px;
+  background: var(--face);
+  border: 1px solid var(--shadow);
+  border-radius: 3px;
+}
+.paint-current {
+  width: 26px; height: 22px; margin-right: 6px;
+  border: 1px solid var(--well-border);
+  border-radius: 2px;
+}
+.paint-swatch {
+  width: 18px; height: 18px;
+  border: 1px solid var(--shadow);
+  border-radius: 2px;
+  padding: 0; cursor: default;
+}
+
+/* ==========================================================  audit  */
+.audit { flex: 1 1 auto; min-height: 0; }
+.audit-actions { flex: 0 0 auto; }
+.audit-head {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--well-muted);
+  margin-bottom: 9px;
+}
+.audit-score { font-weight: bold; color: var(--well-accent); }
+
+.audit-card {
+  padding: 11px 13px;
+  margin-bottom: 11px;
+  background: var(--well-alt);
+  border: 1px solid var(--well-rule);
+  border-radius: 3px;
+}
+.audit-tool {
+  display: inline-block;
+  font-size: 10px; text-transform: uppercase; letter-spacing: .8px;
+  padding: 2px 7px; margin-bottom: 7px;
+  border-radius: 3px;
+  background: var(--accent); color: var(--accent-text);
+}
+.audit-finding { margin: 0 0 6px; font-size: 14px; }
+.audit-detail { margin: 0; font-size: 11px; color: var(--well-muted); }
+
+.audit-verdict {
+  padding: 10px 12px;
+  border-left: 4px solid var(--shadow);
+  background: var(--well-alt);
+  border-radius: 0 3px 3px 0;
+}
+.audit-verdict.is-right { border-left-color: var(--ok); }
+.audit-verdict.is-wrong { border-left-color: var(--bad); }
+.audit-verdict p { margin: 4px 0 0; }
+
+.audit-bar {
+  height: 18px; margin: 5px 0 13px;
+  padding: 2px;
+  background: var(--well);
+  border: 1px solid var(--well-border);
+  border-radius: 2px;
+}
+.audit-bar-fill {
+  height: 100%;
+  border-radius: 1px;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,.6) 0%, rgba(255,255,255,.12) 46%,
+      rgba(0,0,0,.06) 54%, rgba(0,0,0,.16) 100%),
+    var(--accent);
+}
+.audit-close {
+  margin: 13px 0;
+  padding: 11px 13px;
+  border-left: 4px solid var(--accent);
+  background: var(--well-alt);
+  border-radius: 0 3px 3px 0;
+}
+.audit-close p { margin: 0; font-style: italic; }
+.audit-note { font-size: 11px; color: var(--well-muted); }
+
+/* ========================================================  gallery  */
+.gallery-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid; place-items: center;
+  padding: 9px;
+  background: var(--well);
+  border: 1px solid var(--well-border);
+}
+.gallery-plate { max-width: 100%; max-height: 100%; object-fit: contain; }
+.gallery-plate.is-placeholder { image-rendering: pixelated; }
+.gallery-caption { flex: 0 0 auto; padding: 0 2px; }
+.gallery-title { margin: 0; font-size: 13px; }
+.gallery-meta { margin: 2px 0 4px; font-size: 11px; color: var(--well-accent); }
+.gallery-text { margin: 0; font-size: 11px; line-height: 1.55; }
+.gallery-nav { align-items: center; }
+.gallery-pager { display: flex; gap: 3px; margin-left: auto; }
+.page-btn {
+  font: inherit; font-size: 11px;
+  width: 21px; height: 21px;
+  cursor: default;
+  color: var(--text);
+  border: 1px solid var(--well-border);
+  border-radius: 3px;
+  background: linear-gradient(180deg, #FFFFFF 0%, var(--face) 100%);
+}
+.page-btn.is-active {
+  font-weight: bold;
+  color: var(--accent-text);
+  border-color: var(--accent-dark);
+  background: linear-gradient(180deg,
+    rgba(255,255,255,.45) 0%, rgba(0,0,0,.12) 100%), var(--accent);
+}
+
+/* ========================================================  display  */
+.os-select {
+  font: inherit;
+  font-size: 11px;
+  width: 100%;
+  padding: 4px 24px 4px 6px;
+  border: 1px solid var(--well-border);
+  border-radius: 3px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--well);
+  color: var(--well-text);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text) 50%),
+    linear-gradient(135deg, var(--text) 50%, transparent 50%);
+  background-position: calc(100% - 13px) 10px, calc(100% - 9px) 10px;
+  background-size: 4px 4px, 4px 4px;
+  background-repeat: no-repeat;
+}
+.scheme-row { grid-template-columns: 54px 1fr; margin: 13px 0 11px; }
+
+/* ---- the miniature desktop that previews a scheme ---- */
+.scheme-preview {
+  position: relative;
+  height: 150px;
+  padding: 10px;
+  overflow: hidden;
+  background: var(--desktop);
+  border: 1px solid var(--well-border);
+}
+.sp-win {
+  position: absolute;
+  background: var(--win-border);
+  padding: 0 2px 2px;
+  border-radius: 5px 5px 2px 2px;
+  box-shadow: 1px 2px 6px rgba(0,0,0,.35);
+}
+.sp-back  { left: 14px; top: 12px; width: 62%; height: 74px; }
+.sp-front { left: 44px; top: 46px; width: 62%; height: 88px; }
+.sp-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 16px;
+  margin: 0 -2px;
+  padding: 0 4px;
+  border-radius: 4px 4px 0 0;
+  font-size: 9px;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-shadow: 1px 1px 1px rgba(0,0,0,.4);
+}
+.sp-bar-idle {
+  background: linear-gradient(180deg, var(--title-idle), var(--title-idle-to));
+  color: var(--title-idle-text);
+}
+.sp-bar-active {
+  color: var(--title-text);
+  background: linear-gradient(180deg,
+    var(--title-gloss) 0%, var(--title-from) 12%,
+    var(--title-mid) 46%, var(--title-to) 92%);
+}
+.sp-btns { letter-spacing: 1px; opacity: .9; }
+.sp-body { padding: 5px 4px; background: var(--face); }
+.sp-well {
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px;
+  margin-bottom: 5px;
+  font-size: 9px;
+  background: var(--well);
+  color: var(--well-text);
+  border: 1px solid var(--well-border);
+}
+.sp-selected { padding: 0 3px; background: var(--accent); color: var(--accent-text); }
+.sp-button {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 9px;
+  color: var(--text);
+  border: 1px solid var(--well-border);
+  border-radius: 3px;
+  background: linear-gradient(180deg, #FFFFFF, var(--face));
+}
+
+.wall-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(98px, 1fr));
+  gap: 8px;
+  margin: 9px 0 5px;
+}
+.wall-option {
+  font: inherit; font-size: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 5px 4px;
+  cursor: default;
+  color: var(--text);
+  border: 1px solid var(--shadow);
+  border-radius: 3px;
+  background: linear-gradient(180deg, #FFFFFF 0%, var(--face) 100%);
+}
+.wall-option img {
+  width: 100%; height: 46px; object-fit: cover;
+  border: 1px solid var(--shadow-dark);
+}
+.wall-option.is-active {
+  font-weight: bold;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.file-input {
+  font: inherit; font-size: 11px;
+  width: 100%;
+  padding: 5px;
+  background: var(--well);
+  color: var(--well-text);
+  border: 1px solid var(--well-border);
+  border-radius: 3px;
+}
+
+/* ====================================================  time machine  */
+.tm-dial { display: flex; align-items: stretch; gap: 9px; margin: 15px 0 13px; }
+.tm-dial-cell {
+  flex: 1 1 0;
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 9px 11px;
+  background: var(--well);
+  color: var(--well-text);
+  border: 1px solid var(--well-border);
+  border-radius: 3px;
+}
+.tm-dial-cell.is-dest .tm-dial-year { color: var(--well-accent); }
+.tm-dial-label {
+  font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--well-muted);
+}
+.tm-dial-year {
+  font-family: var(--font-mono);
+  font-size: 25px; font-weight: bold; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.tm-dial-arrow { align-self: center; font-size: 14px; color: var(--well-accent); }
+
+.tm-stage {
+  position: fixed; inset: 0; z-index: 900;
+  --k: 0;
+  background: #000;
+  opacity: calc(0.15 + var(--k) * 0.85);
+  display: grid; place-items: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+.tm-scan {
+  position: absolute; inset: -20%;
+  background: repeating-linear-gradient(
+    0deg, rgba(255,255,255,0.10) 0px, rgba(255,255,255,0.10) 1px,
+    transparent 1px, transparent 3px);
+  opacity: calc(0.25 + var(--k) * 0.75);
+  transform: translateY(calc(var(--k) * -40px)) scaleY(calc(1 + var(--k) * 2.2));
+  filter: blur(calc(var(--k) * 1.5px));
+}
+.tm-flash {
+  position: absolute; inset: 0;
+  background: radial-gradient(60% 60% at 50% 50%,
+    rgba(255,255,255,0.95) 0%, rgba(180,210,255,0.5) 40%, transparent 74%);
+  opacity: calc(var(--k) * var(--k) * var(--k));
+  mix-blend-mode: screen;
+}
+.tm-readout {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  text-align: center;
+  transform: scale(calc(1 + var(--k) * 0.35));
+}
+.tm-year {
+  font-family: var(--font-pixel);
+  font-size: clamp(34px, 9vw, 84px);
+  color: #FFFFFF;
+  font-variant-numeric: tabular-nums;
+  text-shadow:
+    calc(var(--k) * -4px) 0 rgba(255,45,111,0.85),
+    calc(var(--k) *  4px) 0 rgba(0,229,255,0.85);
+}
+.tm-status {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .34em;
+  color: #9FD8FF;
+}
+
+body.tm-departing { overflow: hidden; }
+body.tm-departing #desktop,
+body.tm-departing #taskbar {
+  filter: saturate(.3) brightness(0.6);
+  transition: filter .5s ease;
+}
+body.tm-collapse #desktop,
+body.tm-collapse #taskbar,
+body.tm-collapse .tm-readout,
+body.tm-collapse .tm-scan {
+  animation: crt-collapse .6s cubic-bezier(.7,0,.84,0) forwards;
+}
+@keyframes crt-collapse {
+  0%   { transform: scale(1, 1);        opacity: 1; filter: brightness(1); }
+  55%  { transform: scale(1, 0.006);    opacity: 1; filter: brightness(6); }
+  100% { transform: scale(0.001, 0.006); opacity: 0; filter: brightness(10); }
+}
+
+body.tm-arriving::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 900;
+  background: #FFFFFF;
+  animation: crt-open .75s cubic-bezier(.16,1,.3,1) forwards;
+  pointer-events: none;
+}
+@keyframes crt-open {
+  0%   { transform: scale(0.001, 0.006); opacity: 1; }
+  45%  { transform: scale(1, 0.006);     opacity: 1; }
+  100% { transform: scale(1, 1);         opacity: 0; }
+}
+
+/* ========================================================  taskbar  */
+/*  The XP taskbar: a blue gradient with a bright strip along the very
+    top, a green Start button rounded on its right, and a recessed
+    lighter tray at the far end.                                        */
+.taskbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 300;
+  height: 32px;
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  padding: 0 0 0 0;
+  color: #FFFFFF;
+  background:
+    linear-gradient(180deg,
+      var(--task-from) 0%, var(--task-from) 6%,
+      var(--task-mid) 14%, var(--task-mid) 84%,
+      var(--task-to) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
+}
+
+.start-button {
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 15px;
+  font-weight: bold;
+  font-style: italic;
+  display: flex; align-items: center; gap: 6px;
+  height: 100%;
+  padding: 0 22px 2px 9px;
+  border: 0;
+  cursor: default;
+  color: var(--start-text);
+  text-shadow: 1px 1px 2px rgba(0,0,0,.5);
+  border-radius: 0 12px 12px 0;
+  background:
+    linear-gradient(180deg,
+      var(--start-from) 0%, var(--start-mid) 42%,
+      var(--start-to) 88%, var(--start-mid) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5),
+              inset -2px 0 4px rgba(0,0,0,.25);
+}
+.start-button:hover { filter: brightness(1.12); }
+.start-button.is-pressed { filter: brightness(.86); box-shadow: inset 0 2px 5px rgba(0,0,0,.4); }
+.start-logo { width: 20px; height: 20px; }
+
+.task-sep { display: none; }
+
+.task-buttons {
+  flex: 1 1 auto;
+  display: flex; gap: 3px;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 4px;
+}
+.task-btn {
+  font: inherit; font-size: 11px;
+  display: flex; align-items: center; gap: 5px;
+  flex: 0 1 160px;
+  min-width: 34px;
+  height: 23px;
+  padding: 0 8px;
+  cursor: default;
+  text-align: left;
+  color: #FFFFFF;
+  border: 0;
+  border-radius: 3px;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,.22) 0%, rgba(255,255,255,.06) 45%,
+    rgba(0,0,0,.10) 55%, rgba(0,0,0,.20) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28);
+}
+.task-btn img { width: 16px; height: 16px; flex: 0 0 auto; }
+.task-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.task-btn:hover { filter: brightness(1.18); }
+.task-btn.is-active {
+  font-weight: bold;
+  background: linear-gradient(180deg,
+    rgba(0,0,0,.28) 0%, rgba(0,0,0,.14) 50%, rgba(255,255,255,.10) 100%);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.35);
+}
+
+.tray {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: 8px;
+  height: 100%;
+  padding: 0 12px 0 14px;
+  color: #FFFFFF;
+  background: linear-gradient(180deg, var(--tray-from) 0%, var(--tray-to) 55%, var(--tray-from) 100%);
+  box-shadow: inset 2px 0 4px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.35);
+}
+.tray-icon {
+  width: 11px; height: 11px;
+  border-radius: 2px;
+  background: var(--brand-logo);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
+}
+.clock { font-size: 11px; font-variant-numeric: tabular-nums; text-shadow: 1px 1px 1px rgba(0,0,0,.35); }
+
+/* =====================================================  start menu  */
+/*  XP's two-column Start menu: a blue header with the user name, a
+    white column of programs, a tinted column of places, and a footer.  */
+.start-menu {
+  position: fixed;
+  left: 2px;
+  bottom: 32px;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  width: 392px;
+  max-width: calc(100vw - 8px);
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.35), 3px -3px 18px rgba(0,0,0,.45);
+}
+
+.start-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px;
+  color: #FFFFFF;
+  background: linear-gradient(180deg,
+    var(--title-gloss) 0%, var(--menu-header) 22%, var(--menu-header) 78%, rgba(0,0,0,.18) 100%);
+  border-bottom: 2px solid rgba(255,255,255,.35);
+}
+.start-avatar {
+  width: 42px; height: 42px;
+  border-radius: 4px;
+  border: 2px solid rgba(255,255,255,.75);
+  background: linear-gradient(180deg, #FFFFFF, var(--face));
+  display: grid; place-items: center;
+  overflow: hidden;
+}
+.start-avatar img { width: 32px; height: 32px; }
+.start-user {
+  font-size: 15px; font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,.5);
+}
+
+.start-columns { display: flex; align-items: stretch; }
+.start-list {
+  flex: 1 1 58%;
+  padding: 6px 4px;
+  background: var(--menu-left);
+  border-right: 1px solid rgba(0,0,0,.10);
+  max-height: min(58vh, 420px);
+  overflow-y: auto;
+}
+.start-places {
+  flex: 1 1 42%;
+  padding: 6px 4px;
+  background: var(--menu-right);
+}
+
+.start-item {
+  font: inherit; font-size: 12px;
+  display: flex; align-items: center; gap: 9px;
+  width: 100%;
+  padding: 5px 8px;
+  background: none; border: 0; cursor: default;
+  text-align: left;
+  text-decoration: none;
+  color: var(--text);
+  border-radius: 3px;
+}
+.start-item:hover, .start-item:focus-visible {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+.start-item .pixel-icon { flex: 0 0 auto; }
+.start-places .start-item { font-weight: bold; }
+
+.start-sep {
+  height: 1px; margin: 5px 8px;
+  background: rgba(0,0,0,.14);
+}
+
+.start-footer {
+  display: flex; justify-content: flex-end; gap: 14px;
+  padding: 7px 14px;
+  color: #FFFFFF;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,.22) 0%, var(--menu-footer) 30%, var(--menu-footer) 100%);
+  border-top: 2px solid rgba(255,255,255,.30);
+}
+.start-foot-btn {
+  font: inherit; font-size: 11px;
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: 0; cursor: default;
+  color: #FFFFFF;
+  text-shadow: 1px 1px 1px rgba(0,0,0,.4);
+}
+.start-foot-btn:hover { text-decoration: underline; }
+.start-foot-icon {
+  width: 16px; height: 16px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #E86A52, #B8342A);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+}
+
+/* The 98 build had a rotated brand strip down the side. XP has no such
+   thing, so it is hidden rather than removed — shell.js still builds it
+   and other code may still look for it. */
+.start-spine { display: none; }
+
+/* =====================================================  responsive  */
+@media (max-width: 720px) {
+  .icon-layer {
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+    grid-auto-flow: row;
+    grid-template-rows: none;
+    grid-auto-rows: 86px;
+    gap: 4px 2px;
+  }
+  .desk-icon { width: 100%; }
+  .win-body.row { flex-direction: column; }
+  .paint-rail { flex-direction: row; width: auto; flex-wrap: wrap; }
+  .paint-rail .paint-tool { flex: 1 1 60px; }
+  .paint-sizes { flex: 1 1 100%; }
+  .meter-row { grid-template-columns: 1fr 96px; }
+  .field-row { grid-template-columns: 62px 1fr; }
+  .start-menu { width: calc(100vw - 4px); }
+  .start-columns { flex-direction: column; }
+  .start-list, .start-places { flex: 1 1 auto; border-right: 0; }
+  .start-list { max-height: 40vh; }
+  .task-btn { flex: 1 1 auto; }
+  .start-button { font-size: 13px; padding: 0 16px 2px 7px; }
+}
+
+@media (max-width: 420px) {
+  .id-card { flex-direction: column; align-items: flex-start; }
+  .toolbar .btn { flex: 1 1 auto; min-width: 0; }
+}
+
+/* ==================================================  assistant + mascot */
+/*  Carried over from the 98 build. These use the same palette tokens,
+    so they pick up XP colours automatically. */
+
+/* ======================================================  assistant  */
+.chat-log {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 12px;
+  overflow-y: auto;
+  user-select: text;
+}
+
+.chat-row { display: flex; flex-direction: column; gap: 3px; max-width: 92%; }
+.chat-row.chat-user { align-self: flex-end; align-items: flex-end; }
+
+.chat-who {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: var(--well-muted);
+}
+.chat-user .chat-who { color: var(--well-accent); }
+
+.chat-bubble {
+  font-size: 12px;
+  line-height: 1.55;
+  padding: 7px 10px;
+  white-space: pre-wrap;
+  background: var(--well-alt);
+  box-shadow:
+    inset  1px  1px 0 0 var(--shadow),
+    inset -1px -1px 0 0 var(--highlight);
+}
+.chat-user .chat-bubble {
+  background: var(--accent);
+  color: var(--accent-text);
+  box-shadow:
+    inset -1px -1px 0 0 var(--shadow-dark),
+    inset  1px  1px 0 0 var(--highlight);
+}
+.chat-bubble.is-thinking { color: var(--well-muted); font-style: italic; }
+
+.chat-disclaimer {
+  margin: 2px 0 0;
+  font-size: 10px;
+  color: var(--well-muted);
+}
+
+/* ---- suggestion chips ---- */
+.chat-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chat-chip {
+  font: inherit;
+  font-size: 11px;
+  padding: 4px 9px;
+  border: 0;
+  cursor: default;
+  background: var(--face);
+  color: var(--text);
+  box-shadow:
+    inset -1px -1px 0 0 var(--shadow-dark),
+    inset  1px  1px 0 0 var(--highlight),
+    inset -2px -2px 0 0 var(--shadow),
+    inset  2px  2px 0 0 var(--face-light);
+}
+.chat-chip:active {
+  box-shadow:
+    inset  1px  1px 0 0 var(--shadow-dark),
+    inset -1px -1px 0 0 var(--highlight),
+    inset  2px  2px 0 0 var(--shadow),
+    inset -2px -2px 0 0 var(--face-light);
+}
+
+/* ---- the citations panel ---- */
+.chat-sources { margin-top: 2px; }
+.chat-sources-toggle {
+  font: inherit;
+  font-size: 10px;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  cursor: default;
+  color: var(--well-accent);
+  text-align: left;
+}
+.chat-sources-list {
+  margin-top: 4px;
+  padding: 6px 8px;
+  background: var(--well-alt);
+  box-shadow:
+    inset  1px  1px 0 0 var(--shadow),
+    inset -1px -1px 0 0 var(--highlight);
+}
+.source-item { padding: 5px 0; }
+.source-item + .source-item { border-top: 1px solid var(--well-rule); }
+.source-head {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px;
+  margin-bottom: 3px;
+}
+.source-n { font-weight: bold; color: var(--well-accent); font-size: 10px; }
+.source-title { font-weight: bold; font-size: 11px; }
+.source-meta { font-size: 10px; color: var(--well-muted); }
+.source-text {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--well-muted);
+  white-space: pre-wrap;
+  max-height: 96px;
+  overflow-y: auto;
+}
+
+/* ---- the ask row ---- */
+.chat-form { flex: 0 0 auto; display: flex; gap: 6px; }
+.chat-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  font: inherit;
+  font-size: 12px;
+  padding: 5px 7px;
+  border: 0;
+  background: var(--well);
+  color: var(--well-text);
+  box-shadow:
+    inset  1px  1px 0 0 var(--shadow),
+    inset -1px -1px 0 0 var(--highlight),
+    inset  2px  2px 0 0 var(--shadow-dark),
+    inset -2px -2px 0 0 var(--face-light);
+}
+.chat-input:disabled { color: var(--well-muted); }
+.chat-form .btn { flex: 0 0 auto; min-width: 68px; }
+
+@media (max-width: 420px) {
+  .chat-row { max-width: 100%; }
+  .chat-form .btn { min-width: 54px; }
+}
+
+/* A quote presented in place of a written answer, labelled as one. */
+.chat-note {
+  margin: 3px 0 0;
+  font-size: 10px;
+  font-style: italic;
+  color: var(--well-muted);
+}
+
+/* =======================================================  mascot  */
+/*  Sits above the taskbar, bottom right. Deliberately outside the
+    desktop element so it survives a maximised window — the whole point
+    is that it is always reachable.                                   */
+.mascot {
+  position: fixed;
+  right: 14px;
+  bottom: 38px;          /* clear of the 30px taskbar */
+  z-index: 350;          /* over windows, under the Start menu */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  pointer-events: none;  /* only the parts that need it */
+}
+.mascot > * { pointer-events: auto; }
+
+/* Dim rather than hide while the assistant is open: vanishing furniture
+   is disorienting, and it still has to be there to click again. */
+.mascot.is-dimmed { opacity: .35; }
+.mascot.is-dimmed:hover { opacity: 1; }
+
+.mascot-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+  animation: mascot-bob 3.2s ease-in-out infinite;
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .35));
+}
+.mascot-btn:active { transform: translateY(1px); }
+.mascot-img {
+  display: block;
+  width: 72px;
+  height: 72px;
+  image-rendering: pixelated;
+}
+
+@keyframes mascot-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+
+/* ---- the balloon ---- */
+.mascot-balloon {
+  position: relative;
+  max-width: 224px;
+  padding: 8px 22px 9px 10px;
+  font-size: 11px;
+  line-height: 1.45;
+  /* Office Assistant balloons were pale yellow, not window grey — it is
+     what made them read as a character speaking rather than a dialog. */
+  background: #FFFFE1;
+  color: #000000;
+  box-shadow:
+    inset -1px -1px 0 0 var(--shadow-dark),
+    inset  1px  1px 0 0 var(--highlight),
+    inset -2px -2px 0 0 var(--shadow),
+    inset  2px  2px 0 0 #FFFFF4,
+    2px 2px 0 0 rgba(0, 0, 0, .3);
+  animation: mascot-pop .16s ease-out;
+}
+.mascot-balloon-text { margin: 0; }
+
+/* The tail, pointing down at the character. */
+.mascot-balloon::after {
+  content: "";
+  position: absolute;
+  right: 26px;
+  bottom: -7px;
+  width: 0; height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid #FFFFE1;
+  filter: drop-shadow(0 1px 0 var(--shadow-dark));
+}
+
+.mascot-balloon-close {
+  position: absolute;
+  top: 3px; right: 3px;
+  width: 15px; height: 14px;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  background: var(--face);
+  color: var(--text);
+  box-shadow:
+    inset -1px -1px 0 0 var(--shadow-dark),
+    inset  1px  1px 0 0 var(--highlight),
+    inset -2px -2px 0 0 var(--shadow),
+    inset  2px  2px 0 0 var(--face-light);
+}
+.mascot-balloon-close:active {
+  box-shadow:
+    inset  1px  1px 0 0 var(--shadow-dark),
+    inset -1px -1px 0 0 var(--highlight);
+}
+
+@keyframes mascot-pop {
+  from { opacity: 0; transform: translateY(4px) scale(.96); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (max-width: 560px) {
+  .mascot { right: 8px; bottom: 34px; }
+  .mascot-img { width: 56px; height: 56px; }
+  .mascot-balloon { max-width: 178px; font-size: 10px; }
+}
+
+/* Someone who asked for less motion should not get a bobbing robot. */
+@media (prefers-reduced-motion: reduce) {
+  .mascot-btn { animation: none; }
+  .mascot-balloon { animation: none; }
+}
+
+
+/* ====================================================  quick launch  */
+/*  A one-click shortcut strip beside Start, as XP had. It exists for a
+    single button: the way forward to 2026.                            */
+.quick-launch {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 7px 0 6px;
+  margin-left: 3px;
+  box-shadow: inset 1px 0 0 rgba(0,0,0,.25), inset 2px 0 0 rgba(255,255,255,.18),
+              inset -1px 0 0 rgba(0,0,0,.25), inset -2px 0 0 rgba(255,255,255,.18);
+}
+
+.quick-btn {
+  font: inherit;
+  font-size: 11px;
+  font-weight: bold;
+  display: flex; align-items: center; gap: 5px;
+  height: 22px;
+  padding: 0 8px 0 6px;
+  border: 0;
+  border-radius: 3px;
+  cursor: default;
+  color: #FFFFFF;
+  text-shadow: 1px 1px 1px rgba(0,0,0,.45);
+  background: linear-gradient(180deg,
+    rgba(255,255,255,.30) 0%, rgba(255,255,255,.08) 45%,
+    rgba(0,0,0,.10) 55%, rgba(0,0,0,.22) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+}
+.quick-btn img { width: 16px; height: 16px; flex: 0 0 auto; }
+.quick-btn:hover { filter: brightness(1.25); }
+.quick-btn:active { filter: brightness(.85); box-shadow: inset 0 2px 4px rgba(0,0,0,.35); }
+
+/*  A slow breath until it has been used once. Not a flash — it sits in
+    the taskbar the whole time someone is reading, and a fast pulse
+    there would be maddening.                                          */
+.quick-btn.is-nudging { animation: quick-breathe 2.6s ease-in-out infinite; }
+@keyframes quick-breathe {
+  0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 0 0 0 rgba(255,255,255,.55); }
+  50%      { box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 0 7px 2px rgba(255,255,255,.42); }
+}
+
+/* ======================================================  balloon tip  */
+/*  XP's notification balloon: pale yellow, rounded, with a tail. Bottom
+    left, so it never argues with the assistant mascot bottom right.    */
+.tip-balloon {
+  position: fixed;
+  left: 10px;
+  bottom: 44px;
+  z-index: 350;
+  width: 268px;
+  padding: 11px 13px 12px;
+  background: #FFFFE1;
+  color: #000000;
+  border: 1px solid #8A8A6E;
+  border-radius: 6px;
+  box-shadow: 2px 3px 10px rgba(0,0,0,.35);
+  font-size: 11px;
+  line-height: 1.5;
+  animation: tip-in .32s cubic-bezier(.16,1,.3,1) both;
+}
+.tip-balloon.is-going { animation: tip-out .5s ease forwards; }
+@keyframes tip-in {
+  from { opacity: 0; transform: translateY(8px) scale(.96); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes tip-out {
+  to { opacity: 0; transform: translateY(6px); }
+}
+
+.tip-balloon strong { display: block; margin-bottom: 3px; }
+.tip-balloon span { display: block; color: #4A4A3E; }
+
+.tip-close {
+  position: absolute;
+  top: 5px; right: 6px;
+  width: 16px; height: 16px;
+  padding: 0;
+  font: bold 13px/1 Tahoma, sans-serif;
+  background: none;
+  border: 0;
+  border-radius: 2px;
+  cursor: default;
+  color: #6A6A56;
+}
+.tip-close:hover { background: rgba(0,0,0,.10); }
+
+.tip-go {
+  margin-top: 9px;
+  font: inherit;
+  font-size: 11px;
+  padding: 4px 12px;
+  cursor: default;
+  color: var(--text);
+  border: 1px solid var(--well-border);
+  border-radius: 3px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F3F1E7 48%, var(--face) 52%, #DEDACA 100%);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.tip-go:hover { border-color: #E9A93B; }
+
+/*  The tail, pointing down at the quick-launch button.                */
+/*  `left` is overwritten from shell.js so the tail lands on the
+    quick-launch button whatever width the Start button happens to be. */
+.tip-tail {
+  position: absolute;
+  left: 26px; bottom: -7px;
+  width: 12px; height: 12px;
+  background: #FFFFE1;
+  border-right: 1px solid #8A8A6E;
+  border-bottom: 1px solid #8A8A6E;
+  transform: rotate(45deg);
+}
+
+@media (max-width: 720px) {
+  .quick-label { display: none; }
+  /*  The assistant mascot owns the bottom-right corner and its balloon
+      is wide. On a phone there is no room for the two side by side, so
+      this one sits ABOVE it rather than trying to squeeze in beside it.
+      The tail goes with it — pointing down at a button two hundred
+      pixels away would be worse than not pointing at all. */
+  .tip-balloon {
+    width: calc(100vw - 20px);
+    max-width: 320px;
+    bottom: 168px;
+    padding: 10px 12px 11px;
+  }
+  .tip-tail { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tip-balloon { animation: none; }
+  .quick-btn.is-nudging { animation: none; }
+}

@@ -1,0 +1,24 @@
+# What must NOT be uploaded to a public host.
+#
+# Everything in the deployed folder is served as a static file. The index
+# gate (`npm run check`) guards what the ASSISTANT can say; this guards
+# what a stranger can simply download. They are different boundaries, and
+# missing this one publishes the source documents whole.
+
+# The knowledge base and, critically, knowledge/_private/ — the internal
+# work-memory documents that name every client brand and describe their
+# websites' defects. The serverless function does not need them: it reads
+# data/index.json, which is built from them and carries no client names.
+knowledge/
+
+# Dev and build scripts. Nothing at runtime calls them.
+tools/
+
+# Keys. Vercel injects real environment variables; these are local only.
+.env
+.env.local
+.env.*.local
+
+# Local scratch
+.cv-profile/
+node_modules/
