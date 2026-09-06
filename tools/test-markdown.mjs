@@ -32,7 +32,7 @@ function html(node) {
   return "<" + node.tagName + cls + ">" + inner + "</" + node.tagName + ">";
 }
 
-const { renderMarkdown } = await import("../src/apps/assistant.js");
+const { renderMarkdown } = await import("../src/lib/markdown.js");
 
 function render(text) {
   const root = makeNode("div");
@@ -54,16 +54,16 @@ const real = [
 const out = render(real);
 
 const checks = [
-  ["lead-in becomes a paragraph", /^<p class="chat-para">My day-to-day/.test(out)],
+  ["lead-in becomes a paragraph", /^<p class="md-para">My day-to-day/.test(out)],
   ["bold becomes strong", out.includes("<strong>marketing strategy</strong>")],
   ["asterisks are gone", !out.includes("**")],
-  ["run-on bullets become a list", /<ul class="chat-list"><li>/.test(out)],
+  ["run-on bullets become a list", /<ul class="md-list"><li>/.test(out)],
   ["both bullets captured", (out.match(/<li>/g) || []).length === 2],
   ["bullet markers stripped", !/<li>-/.test(out)],
   ["trailing block still a paragraph", out.endsWith("I do not write code myself.</p>")],
 
   ["numbered list becomes ol", render("1. first\n2. second").startsWith("<ol")],
-  ["heading demoted to bold", render("## Roles\ntext").startsWith('<p class="chat-para"><strong>Roles</strong></p>')],
+  ["heading demoted to bold", render("## Roles\ntext").startsWith('<p class="md-para"><strong>Roles</strong></p>')],
   ["inline code kept", render("run `npm test` now").includes("<code>npm test</code>")],
 
   // The security property: markup in the model's output must stay text.

@@ -9,6 +9,7 @@
 // =====================================================================
 
 import { assistant } from "../../config/assistant.js";
+import { renderMarkdown, toSections } from "../lib/markdown.js";
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -16,102 +17,6 @@ function el(tag, className, text) {
   if (text !== undefined) node.textContent = text;
   return node;
 }
-
-// ------------------------------------------------------- markdown
-//  The model is asked to answer with bold and bullets, so something
-//  has to turn that into elements. Without it a reader sees literal
-//  asterisks, which looks like a broken bot rather than an emphasis.
-//
-//  Every leaf here is written with textContent and every element is
-//  built by hand — never innerHTML. Model output is untrusted text,
-//  and the cheapest way to be sure a stray <script> stays harmless
-//  is to make markup impossible to express in the first place.
-
-const BULLET = /^([-*\u2022]|\d+[.)])\s+/;
-const HEADING = /^#{1,6}\s+/;
-
-/** Inline **bold**, *italic* and `code` inside one line of text. */
-function renderInline(target, text) {
-  const pattern = /\*\*([^*]+)\*\*|\*([^*\n]+)\*|`([^`]+)`/g;
-  let last = 0;
-  let m;
-  while ((m = pattern.exec(text)) !== null) {
-    if (m.index > last) {
-      target.appendChild(document.createTextNode(text.slice(last, m.index)));
-    }
-    if (m[1] !== undefined) target.appendChild(el("strong", null, m[1]));
-    else if (m[2] !== undefined) target.appendChild(el("em", null, m[2]));
-    else target.appendChild(el("code", null, m[3]));
-    last = pattern.lastIndex;
-  }
-  if (last < text.length) {
-    target.appendChild(document.createTextNode(text.slice(last)));
-  }
-}
-
-/**
- * Render a block of markdown into the bubble.
- *
- * Blocks are split on blank lines, but the model does not reliably
- * leave one before a list — "Here is what that looks like:" followed
- * immediately by three bullets arrives as a single block. So each
- * block is walked line by line and consecutive bullets are gathered
- * into a list wherever they start.
- */
-function renderMarkdown(target, text) {
-  const source = String(text || "").trim();
-  target.textContent = "";
-
-  source.split(/\n{2,}/).forEach(function (block) {
-    const lines = block.split("\n")
-      .map(function (line) { return line.trim(); })
-      .filter(Boolean);
-
-    let i = 0;
-    while (i < lines.length) {
-      if (BULLET.test(lines[i])) {
-        const ordered = /^\d/.test(lines[i]);
-        const list = el(ordered ? "ol" : "ul", "chat-list");
-        while (i < lines.length && BULLET.test(lines[i])) {
-          const item = document.createElement("li");
-          renderInline(item, lines[i].replace(BULLET, ""));
-          list.appendChild(item);
-          i++;
-        }
-        target.appendChild(list);
-        continue;
-      }
-
-      // A heading inside a three-sentence answer is over-formatting, so
-      // it is demoted to a bold line rather than given its own scale.
-      if (HEADING.test(lines[i])) {
-        const head = el("p", "chat-para");
-        head.appendChild(el("strong", null, lines[i].replace(HEADING, "")));
-        target.appendChild(head);
-        i++;
-        continue;
-      }
-
-      const run = [];
-      while (i < lines.length && !BULLET.test(lines[i]) && !HEADING.test(lines[i])) {
-        run.push(lines[i]);
-        i++;
-      }
-      const para = el("p", "chat-para");
-      renderInline(para, run.join(" "));
-      target.appendChild(para);
-    }
-  });
-
-  // Never leave an empty bubble: if the text was nothing but markup
-  // this renderer does not understand, show it raw.
-  if (!target.childNodes.length) target.textContent = source;
-}
-
-// Exported for tools/test-markdown.mjs. The renderer is the one piece
-// of this file that is pure enough to test without a browser, and the
-// one place where untrusted model output becomes DOM.
-export { renderMarkdown };
 
 export const assistantApp = {
   id: "assistant",
@@ -151,64 +56,12 @@ export const assistantApp = {
     }
 
     /**
-     * Turn one stored note into something a person can read.
-     *
-     * What comes back is markdown, cut into chunks by length, so a raw
-     * excerpt can open mid-sentence and carry ** and > along with it.
-     * Shown as it is stored it reads as a broken page rather than as
-     * evidence, which defeats the whole point of showing it.
-     */
-    function cleanExcerpt(text) {
-      let t = String(text || "")
-        .replace(/`([^`]+)`/g, "$1")
-        .replace(/\*\*([^*]+)\*\*/g, "$1")
-        .replace(/\*([^*\n]+)\*/g, "$1")
-        .replace(/^\s*#{1,6}\s+/gm, "")
-        .replace(/^\s*>\s?/gm, "")
-        .replace(/^\s*([-*\u2022]|\d+[.)])\s+/gm, "")
-        .replace(/\s+/g, " ")
-        .trim();
-
-      // A chunk that opens mid-sentence starts at its first whole one
-      // instead — "with drawn SVG art." is not evidence of anything.
-      if (/^[a-z]/.test(t)) {
-        const next = t.search(/[.!?]\s+[A-Z0-9]/);
-        t = next === -1 ? "" : t.slice(next + 1).trim();
-      }
-
-      // End on a full stop rather than mid-word.
-      if (t.length > 260) {
-        const stop = t.lastIndexOf(". ", 260);
-        t = stop > 90
-          ? t.slice(0, stop + 1)
-          : t.slice(0, 260).replace(/\s+\S*$/, "") + "…";
-      }
-      return t;
-    }
-
-    /**
      * The collapsible "where this came from" block under an answer.
-     *
-     * Grouped by section, not by chunk: ten retrieved chunks routinely
-     * come from four sections, and a visitor wants to know which parts
-     * of his notes an answer rests on — not how the corpus happens to
-     * be cut up, which file it lives in, or which half of the search
-     * found it. That is all machinery, and machinery on screen is what
-     * made this window look broken.
+     * Grouped into sections by the shared helper, so this window and the
+     * 2026 site show a visitor the same thing.
      */
     function addSources(row, passages) {
-      if (!passages || !passages.length) return;
-
-      const seen = {};
-      const sections = [];
-      passages.forEach(function (p) {
-        const title = p.heading || "From his notes";
-        if (seen[title]) return;
-        const text = cleanExcerpt(p.text);
-        if (!text) return;
-        seen[title] = true;
-        sections.push({ title: title, text: text });
-      });
+      const sections = toSections(passages);
       if (!sections.length) return;
 
       const wrap = el("div", "chat-sources");
@@ -228,7 +81,8 @@ export const assistantApp = {
 
       toggle.addEventListener("click", function () {
         list.hidden = !list.hidden;
-        toggle.textContent = (list.hidden ? "▸" : "▾") + " Where this came from";
+        toggle.textContent = (list.hidden ? "▸" : "▾") +
+          " Where this came from";
         if (!list.hidden) scrollDown();
       });
 

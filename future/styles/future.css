@@ -626,6 +626,26 @@ a { color: inherit; text-decoration: none; }
 .ask-row.is-user .ask-text { font-weight: 600; }
 .ask-row.is-bot .ask-text { color: var(--cream-dim); }
 
+/* ---- rendered answers ----
+   The assistant replies in markdown and src/lib/markdown.js turns it
+   into real elements, so a bot bubble holds paragraphs and lists rather
+   than one run of text. Class names are shared with the desktop site;
+   only the colours differ. */
+.ask-text .md-para,
+.ask-text .md-list { margin: 0; }
+.ask-text .md-para + .md-para,
+.ask-text .md-para + .md-list,
+.ask-text .md-list + .md-para { margin-top: 12px; }
+.ask-text .md-list { padding-left: 20px; }
+.ask-text .md-list li + li { margin-top: 6px; }
+.ask-text strong { color: var(--cream); font-weight: 600; }
+.ask-text em { font-style: italic; }
+.ask-text code {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  color: var(--cream);
+}
+
 .ask-text.is-thinking { opacity: 0.5; }
 .ask-text.is-thinking::after {
   content: "";
@@ -668,15 +688,12 @@ a { color: inherit; text-decoration: none; }
   padding: 12px 0;
   border-bottom: 1px solid var(--rule-dark);
 }
-.ask-source-head {
-  display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px;
+.ask-source-title {
   margin-bottom: 6px;
   font-size: 10px; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--cream);
 }
-.ask-source-n { color: var(--cream); }
-.ask-source-title { color: var(--cream-dim); }
-.ask-source-meta { color: var(--cream-dim); opacity: 0.6; margin-left: auto; }
 .ask-source-text {
   margin: 0;
   font-size: 13px;
@@ -738,7 +755,6 @@ a { color: inherit; text-decoration: none; }
 
 @media (max-width: 560px) {
   .ask-log { max-height: 58vh; }
-  .ask-source-meta { margin-left: 0; width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {

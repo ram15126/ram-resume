@@ -39,7 +39,7 @@ export const voice = {
     //   "I don't run campaigns. I build what runs them."
     line: "I build the machines that do the marketing.",
 
-    sub: "Three marketing jobs at once. Ten people reporting to me. Nine client brands audited. One degree still in progress. Zero developers on payroll.",
+    sub: "Three marketing jobs at once. Ten people reporting to me. Thirteen client brands audited. One degree still in progress. Zero developers on payroll.",
     scrollHint: "SCROLL TO TRAVEL"
   },
 
@@ -62,7 +62,7 @@ export const voice = {
 
       body: [
         "I'm a Marketing Management undergraduate running three concurrent marketing roles — an agency I co-founded, an SEO and content programme, and remote demand generation for a healthcare AI product out of Belgium.",
-        "Most marketers wait on a developer, a designer and an editor. I don't. I scope the system, direct AI to build it, and verify every output before it reaches a client — so a lead-generation engine, an audit tool and a two-and-a-half-minute film can all ship in the same quarter.",
+        "Most marketers wait on a developer, a designer and an editor. I don't. I scope the system, direct AI to build it, and verify every output before it reaches a client — so a lead-generation engine, an audit tool and a two-minute film can all ship in the same quarter.",
         "The strategy, the judgement and the verification are mine. The typing isn't, and I'm not going to pretend it is."
       ],
       items: []
@@ -96,10 +96,10 @@ export const voice = {
           org: "Siva Comics · Chennai",
           when: "Jun 2026 — now",
           lines: [
-            "SEO, AEO and GEO audit programmes across 9 client brands. Client-facing reports, prioritized and effort-ranked, every finding with a reproducible verification step attached.",
+            "SEO, AEO and GEO audit programmes across 13 client brands. Client-facing reports, prioritized and effort-ranked, every finding with a reproducible verification step attached.",
             "Specified 17 prioritized findings for a WordPress e-commerce client. They implemented them. Site health went 43 → 65.",
             "Topical maps, cluster architectures, content briefs, 30-day editorial plans with information-gain gating. AI-citation plans, answer blocks, llms.txt — so the content is citable by AI search.",
-            "Directed a fully AI-generated 2.5-minute corporate heritage film: 25 scenes, 38 clips, ElevenLabs voiceover, 17 cuts, two client review calls.",
+            "Directed a fully AI-generated 2-minute heritage film for a global IT services client: a 24-shot build sheet, 38 clips, ElevenLabs voiceover, 17 cuts, two client review calls.",
             "Built a 30-day Instagram content system and run social for multiple brands."
           ]
         },
@@ -151,7 +151,7 @@ export const voice = {
           org: "Original research · OpenStreetMap / Overpass API",
           when: "",
           lines: [
-            "161 Chennai small-business sites, sampled from OpenStreetMap, published CC BY 4.0 with Dataset schema as a citable link-earning asset.",
+            "161 Chennai small-business sites sampled from OpenStreetMap, 125 of them audited, published CC BY 4.0 with Dataset schema as a citable link-earning asset.",
             "56% with no structured data. 61.6% missing image alt text. 94.4% missing a recommended security header. Aggregate only.",
             "I threw away my first sample — a web search that returned businesses on three other continents. Honoured robots.txt, excluded four sites that disallowed crawling."
           ]
@@ -188,11 +188,11 @@ export const voice = {
       ],
       items: [],
       stats: [
-        { value: "9",    label: "client brands audited" },
+        { value: "13",   label: "client brands audited" },
         { value: "500+", label: "URLs covered" },
         { value: "10",   label: "people on my team" },
         { value: "104",  label: "B2B leads sourced and qualified" },
-        { value: "161",  label: "sites in my own research study" },
+        { value: "161",  label: "sites sampled for my own study" },
         { value: "361",  label: "carousel slides shipped" },
         { value: "78",   label: "evidence collectors I specified" },
         { value: "38",   label: "clips in the film I directed" }

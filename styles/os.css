@@ -1269,13 +1269,13 @@ body.tm-arriving::before {
    The assistant replies in markdown, so a bot bubble holds real
    paragraphs and lists. pre-wrap stays on the bubble for plain
    messages; rendered blocks set their own spacing instead. */
-.chat-para,
-.chat-list { margin: 0; white-space: normal; }
-.chat-para + .chat-para,
-.chat-para + .chat-list,
-.chat-list + .chat-para { margin-top: 7px; }
-.chat-list { padding-left: 17px; }
-.chat-list li + li { margin-top: 3px; }
+.md-para,
+.md-list { margin: 0; white-space: normal; }
+.md-para + .md-para,
+.md-para + .md-list,
+.md-list + .md-para { margin-top: 7px; }
+.md-list { padding-left: 17px; }
+.md-list li + li { margin-top: 3px; }
 .chat-bubble strong { font-weight: bold; }
 .chat-bubble em { font-style: italic; }
 .chat-bubble code {

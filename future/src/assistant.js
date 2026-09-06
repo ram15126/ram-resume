@@ -27,6 +27,7 @@
 
 import { assistant } from "../../config/assistant.js";
 import { voice } from "../config/voice.js";
+import { renderMarkdown, toSections } from "../../src/lib/markdown.js";
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -116,7 +117,9 @@ export function mountAssistant() {
   function addMessage(who, text) {
     const row = el("div", "ask-row is-" + who);
     row.appendChild(el("span", "ask-who", who === "user" ? "You" : "RAM.bot"));
-    const bubble = el("p", "ask-text", text);
+    // A div, not a p: a rendered answer contains paragraphs and lists,
+    // and the browser silently breaks those out of a <p> parent.
+    const bubble = el("div", "ask-text", text);
     row.appendChild(bubble);
     log.appendChild(row);
     scrollDown();
@@ -125,28 +128,27 @@ export function mountAssistant() {
 
   function scrollDown() { body.scrollTop = body.scrollHeight; }
 
-  /*  The passages the answer was built from. This is the whole trust
-      mechanism — an answer you cannot check is just a confident voice. */
+  /*  Where the answer came from. This is the whole trust mechanism — an
+      answer you cannot check is just a confident voice — but the chunk
+      numbers, filenames and search-mode labels it used to print were
+      debugging output wearing a trust mechanism's clothes. Grouped into
+      sections by the shared helper, same as the desktop window. */
   function addSources(row, passages) {
-    if (!passages || !passages.length) return;
+    const sections = toSections(passages);
+    if (!sections.length) return;
 
     const wrap = el("div", "ask-sources");
     const toggle = el("button", "ask-sources-toggle");
     toggle.type = "button";
-    toggle.textContent = "Sources (" + passages.length + ")";
+    toggle.textContent = "Where this came from";
 
     const list = el("div", "ask-sources-list");
     list.hidden = true;
 
-    passages.forEach(function (p) {
+    sections.forEach(function (section) {
       const item = el("div", "ask-source");
-      const h = el("div", "ask-source-head");
-      h.appendChild(el("span", "ask-source-n", "[" + p.n + "]"));
-      h.appendChild(el("span", "ask-source-title", p.heading || "(untitled section)"));
-      h.appendChild(el("span", "ask-source-meta",
-        p.source + (p.via && p.via.length ? " · " + p.via.join(" + ") : "")));
-      item.appendChild(h);
-      item.appendChild(el("p", "ask-source-text", p.text));
+      item.appendChild(el("div", "ask-source-title", section.title));
+      item.appendChild(el("p", "ask-source-text", section.text));
       list.appendChild(item);
     });
 
@@ -166,6 +168,10 @@ export function mountAssistant() {
       "AI-generated" is the same category of wrong this assistant exists
       to avoid. */
   function addDisclaimer(row, mode) {
+    // A greeting is neither AI-written nor quoted from his notes — it is
+    // a canned line, so it gets no provenance claim at all rather than
+    // one that is untrue of it.
+    if (mode === "small-talk") return;
     row.appendChild(el("p", "ask-disclaimer",
       mode === "answered"
         ? assistant.guardrails.disclaimer
@@ -269,8 +275,6 @@ export function mountAssistant() {
     launcher.classList.add("is-busy");
     status.textContent = "Working…";
 
-    const started = Date.now();
-
     try {
       const response = await fetch(assistant.endpoint, {
         method: "POST",
@@ -294,7 +298,7 @@ export function mountAssistant() {
 
       const data = await response.json();
       thinking.bubble.classList.remove("is-thinking");
-      thinking.bubble.textContent = data.answer || assistant.guardrails.refusal;
+      renderMarkdown(thinking.bubble, data.answer || assistant.guardrails.refusals[0]);
 
       if (data.note) thinking.row.appendChild(el("p", "ask-note", data.note));
 
@@ -304,13 +308,14 @@ export function mountAssistant() {
       history.push({ role: "user", content: question });
       history.push({ role: "assistant", content: data.answer || "" });
 
-      const seconds = ((Date.now() - started) / 1000).toFixed(1);
-      const how = data.debug && data.debug.search === "hybrid"
-        ? "keyword + meaning" : "keyword only";
-      status.textContent = data.mode === "refused"
-        ? "Nothing matched — " + seconds + "s"
-        : (data.passages ? data.passages.length : 0) + " passages · " + how +
-          " · " + seconds + "s";
+      // Passage counts, search mode and timings are debugging output. A
+      // visitor reading "10 passages · keyword + meaning · 1.4s" is being
+      // shown the machine, not told anything they asked for.
+      status.textContent =
+        data.mode === "refused" ? "Nothing in his notes on that"
+          : data.mode === "small-talk" ? "Ready"
+          : data.mode === "retrieval-only" ? "Quoted from his notes"
+          : "Answered from his notes";
       scrollDown();
     } catch (err) {
       thinking.bubble.classList.remove("is-thinking");
