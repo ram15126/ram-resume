@@ -1,4 +1,4 @@
-# Desktop Résumé — Ramakrishnan S
+# Desktop Résumé — Ramakrishnan s
 
 An interactive résumé built as a fake operating system — **Windows XP, 2006**, the year he was born. It boots, you get a desktop
 with icons, and every icon opens a draggable window. Some windows hold the CV. Some
