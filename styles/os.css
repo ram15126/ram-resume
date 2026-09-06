@@ -1265,6 +1265,26 @@ body.tm-arriving::before {
 }
 .chat-bubble.is-thinking { color: var(--well-muted); font-style: italic; }
 
+/* ---- rendered answers ----
+   The assistant replies in markdown, so a bot bubble holds real
+   paragraphs and lists. pre-wrap stays on the bubble for plain
+   messages; rendered blocks set their own spacing instead. */
+.chat-para,
+.chat-list { margin: 0; white-space: normal; }
+.chat-para + .chat-para,
+.chat-para + .chat-list,
+.chat-list + .chat-para { margin-top: 7px; }
+.chat-list { padding-left: 17px; }
+.chat-list li + li { margin-top: 3px; }
+.chat-bubble strong { font-weight: bold; }
+.chat-bubble em { font-style: italic; }
+.chat-bubble code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--well);
+  padding: 0 2px;
+}
+
 .chat-disclaimer {
   margin: 2px 0 0;
   font-size: 10px;
@@ -1317,21 +1337,15 @@ body.tm-arriving::before {
 }
 .source-item { padding: 5px 0; }
 .source-item + .source-item { border-top: 1px solid var(--well-rule); }
-.source-head {
-  display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px;
-  margin-bottom: 3px;
-}
-.source-n { font-weight: bold; color: var(--well-accent); font-size: 10px; }
-.source-title { font-weight: bold; font-size: 11px; }
-.source-meta { font-size: 10px; color: var(--well-muted); }
+.source-title { font-weight: bold; font-size: 11px; margin-bottom: 3px; }
 .source-text {
+  /* Excerpts are trimmed to a whole sentence before they get here, so
+     there is nothing left to scroll inside — the inner scrollbar was
+     itself part of what made this panel look broken. */
   margin: 0;
   font-size: 11px;
   line-height: 1.5;
   color: var(--well-muted);
-  white-space: pre-wrap;
-  max-height: 96px;
-  overflow-y: auto;
 }
 
 /* ---- the ask row ---- */

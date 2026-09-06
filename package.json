@@ -14,7 +14,7 @@
     "cv": "node tools/build-cv.mjs",
     "test-providers": "node tools/test-providers.mjs",
     "qa": "node tools/qa.mjs",
-    "test": "node tools/test-providers.mjs && node tools/test-free-path.mjs && node tools/test-api.mjs && node tools/test-model-call.mjs && node tools/check-art.mjs && node tools/check-index.mjs",
+    "test": "node tools/test-providers.mjs && node tools/test-free-path.mjs && node tools/test-api.mjs && node tools/test-smalltalk.mjs && node tools/test-markdown.mjs && node tools/test-model-call.mjs && node tools/check-art.mjs && node tools/check-index.mjs",
     "verify-key": "node tools/verify-key.mjs",
     "live-qa": "node tools/live-qa.mjs",
     "models": "node tools/list-models.mjs",

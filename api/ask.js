@@ -122,27 +122,72 @@ async function embedQuestion(question) {
 // ---------------------------------------------------------------- prompt
 function buildSystemPrompt(passages) {
   const voice = assistant.voice === "first"
-    ? "Answer in the first person, as Ramakrishnan himself."
-    : "Answer in the third person, about Ramakrishnan. You are his assistant, not him.";
+    ? "You ARE Ramakrishnan S, answering visitors to your own portfolio site."
+    : "You are Ramakrishnan S's assistant, answering visitors to his portfolio site.";
 
-  const numbered = passages.map(function (p, i) {
-    const label = p.heading ? p.heading + " (" + p.source + ")" : p.source;
-    return "[" + (i + 1) + "] " + label + "\n" + p.text;
-  }).join("\n\n---\n\n");
+  // Framed as memory rather than as a document set. Labelling this
+  // "PASSAGES" invited the model to talk about passages — and an answer
+  // that says "the provided passages do not contain that" is a sentence
+  // about the retrieval system rather than a reply to a person.
+  const memory = passages.map(function (p) {
+    return "· " + (p.heading ? p.heading + "\n  " : "") +
+           p.text.replace(/\n/g, "\n  ");
+  }).join("\n\n");
 
   return [
-    "You answer questions about Ramakrishnan S for visitors to his portfolio site,",
-    "many of whom are recruiters or potential clients.",
-    "",
     voice,
+    "Most of them are recruiters, potential clients, or people who found the site",
+    "and are curious. Talk to them like a person, not a form.",
     "",
-    "RULES — these are absolute:",
+    "HOW TO ANSWER:",
     assistant.guardrails.rules.map(function (r, i) { return (i + 1) + ". " + r; }).join("\n"),
     "",
-    "PASSAGES — everything you know about him is below. Nothing else is known.",
+    "WHAT YOU KNOW — this is your own memory of your work. Everything you can say",
+    "comes from here. Speak from it directly; never describe it.",
     "",
-    numbered
+    memory
   ].join("\n");
+}
+
+// ------------------------------------------------------------ small talk
+/**
+ * Answer a greeting as a greeting.
+ *
+ * "hi" retrieves nothing, so it used to come back as "that is not
+ * something Ramakrishnan has written about" — the assistant's opening
+ * line to most visitors was a refusal, which reads as broken rather
+ * than careful.
+ *
+ * Matched on WHOLE WORDS, never substrings: "hi" must not fire on
+ * "his projects", and "ty" must not fire on "what tools does he use".
+ */
+function smallTalk(question) {
+  const words = String(question)
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (!words.length || words.length > 5) return null;   // a real question, not a hello
+  const joined = words.join(" ");
+
+  for (const entry of assistant.smallTalk || []) {
+    for (const phrase of entry.match) {
+      if (joined === phrase) return entry.reply;
+
+      // Trailing words are allowed only for greetings ("hey there",
+      // "hi how are you"). Without that restriction "help me find his
+      // email" is swallowed by the "help" entry and never reaches
+      // retrieval, which does have his email.
+      if (!entry.lead) continue;
+      const lead = phrase.split(" ");
+      if (words.length > lead.length && words.length <= 4 &&
+          lead.every(function (w, i) { return words[i] === w; })) {
+        return entry.reply;
+      }
+    }
+  }
+  return null;
 }
 
 // ------------------------------------------------------- extractive answer
@@ -236,6 +281,19 @@ export default async function handler(req, res) {
         .map(function (m) { return { role: m.role, content: String(m.content).slice(0, 2000) }; })
     : [];
 
+  // ---- greetings never reach retrieval or the model ----
+  const chat_ = smallTalk(question);
+  if (chat_) {
+    res.status(200).json({
+      answer: chat_,
+      passages: [],
+      grounded: true,
+      mode: "small-talk",
+      suggestions: assistant.suggestions
+    });
+    return;
+  }
+
   // ---- retrieve ----
   let queryVector = null;
   try {
@@ -305,7 +363,7 @@ export default async function handler(req, res) {
         : onTopic
         ? "Quoted from his notes — no model key is configured, so this is his own " +
           "wording rather than an answer written for your question."
-        : "He has not written directly about that. This is the closest passage in " +
+        : "He has not written about that directly. This is the closest thing in " +
           "his notes, quoted as-is — it may not answer what you asked."),
       passages: cited,
       grounded: true,

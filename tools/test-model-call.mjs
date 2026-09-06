@@ -35,8 +35,9 @@ const checks = [
   // does not silently break the test that guards it.
   ["max_tokens matches config", body.max_tokens === assistant.model.maxTokens],
   ["system is a string", typeof body.system === "string"],
-  ["system carries rules", body.system.includes("RULES")],
-  ["system carries passages", body.system.includes("[1]")],
+  ["system carries rules", body.system.includes("HOW TO ANSWER:")],
+  ["system carries his notes", body.system.includes("WHAT YOU KNOW")],
+  ["system never calls them passages", !/passages/i.test(body.system)],
   ["system carries honesty rule", body.system.includes("sourced and qualified")],
   ["messages is array", Array.isArray(body.messages)],
   ["last message is the question", body.messages.at(-1).content === "Can he code?"],
