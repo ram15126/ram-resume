@@ -14,7 +14,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles/future.css">
+<!-- ROOT-ABSOLUTE, deliberately.
+     vercel.json sets cleanUrls, so this page is served at /future with NO
+     trailing slash. Relative URLs then resolve against the site ROOT, not
+     this folder: "styles/future.css" became "/styles/future.css" (404) and
+     "src/main.js" became "/src/main.js" — which exists, and is the Windows
+     98 desktop's script. It loaded, found none of its own DOM, threw, and
+     the page rendered blank. Absolute paths are correct with or without
+     the trailing slash. -->
+<link rel="stylesheet" href="/future/styles/future.css">
 </head>
 <body>
 
@@ -32,6 +40,6 @@
 <!-- The page. Translated by the smooth-scroll driver. -->
 <div id="page"></div>
 
-<script type="module" src="src/main.js"></script>
+<script type="module" src="/future/src/main.js"></script>
 </body>
 </html>

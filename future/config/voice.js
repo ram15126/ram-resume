@@ -296,7 +296,7 @@ export const voice = {
     linkedin: "https://linkedin.com/in/ramakrishnan15126",
     github: "https://github.com/ram15126",
     pdf: "../assets/Ramakrishnan_S_Resume.pdf",
-    rewind: "../index.html?arrive=2006"
+    rewind: "/?arrive=2006"   // root-absolute: cleanUrls redirects "index.html"
   },
 
   // ---- HUD ----
