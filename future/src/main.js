@@ -9,6 +9,7 @@
 import { voice } from "../config/voice.js";
 import { scene as CFG } from "../config/scene.js";
 import { consumeArrival } from "../../src/lib/arrival.js";
+import { sound } from "../../src/lib/sound.js";
 import { buildPage } from "./sections.js";
 import { createPointer } from "./pointer.js";
 import { mountAssistant } from "./assistant.js";
@@ -184,6 +185,10 @@ updateScrolled();
 const arriving = consumeArrival(2026) && !reduceMotion;
 
 if (arriving) {
+  //  The other half of the journey. The 2006 desktop plays this as it
+  //  departs; without it here the landing is silent under a full-screen
+  //  animation, which reads as the sound having broken.
+  sound.play("warp");
   document.body.classList.add("is-warping");
   warpEl.hidden = false;
   const started = performance.now();

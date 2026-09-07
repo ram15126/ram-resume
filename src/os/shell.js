@@ -7,6 +7,7 @@ import { content } from "../../config/content.js";
 import { iconUrl, iconImg } from "./iconart.js";
 import { launch } from "../apps/registry.js";
 import { onWindowsChanged, focusWindow, minimiseWindow, listWindows } from "./wm.js";
+import { sound } from "../lib/sound.js";
 
 /** Small DOM helper — the same shape the apps use. */
 function el(tag, className, text) {
@@ -40,6 +41,9 @@ export function buildDesktopIcons() {
     btn.addEventListener("click", function (e) {
       if (e.detail === 0) { selectIcon(btn); launch(def.app); return; }  // Enter
       const wasSelected = btn.classList.contains("is-selected");
+      //  Selecting ticks; opening is announced by the window itself, so
+      //  a single click does not fire two sounds on top of each other.
+      if (!wasSelected) sound.play("click");
       selectIcon(btn);
       if (wasSelected) launch(def.app);
     });
@@ -84,6 +88,7 @@ export function buildTaskbar() {
 
   startBtn.addEventListener("click", function (e) {
     e.stopPropagation();
+    sound.play("menu");
     toggleStartMenu();
   });
 
@@ -92,6 +97,7 @@ export function buildTaskbar() {
 
   onWindowsChanged(renderTaskButtons);
   renderTaskButtons(listWindows());
+  buildSoundToggle();
   startClock();
 }
 
@@ -112,10 +118,58 @@ function renderTaskButtons(wins) {
     span.textContent = w.title;
     b.appendChild(span);
     b.addEventListener("click", function () {
-      if (w.focused && !w.minimised) minimiseWindow(w.id);
-      else focusWindow(w.id);
+      //  minimiseWindow makes its own sound; focusing needs one here.
+      if (w.focused && !w.minimised) { minimiseWindow(w.id); return; }
+      sound.play("click");
+      focusWindow(w.id);
     });
     strip.appendChild(b);
+  });
+}
+
+/*  The speaker in the system tray.
+ *
+ *  Every Windows of this era put one here, so it is both the
+ *  period-correct place for it and the first place anyone looks when a
+ *  web page makes a noise they did not ask for. A mute you cannot find
+ *  in one glance is worse than no sound at all.
+ *
+ *  Drawn rather than set in text: an emoji speaker is the wrong century
+ *  and renders differently on every platform, and this has to stay
+ *  legible at eleven pixels.
+ */
+const SPEAKER =
+  '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">' +
+    '<path d="M2 6h3l4-3v10l-4-3H2z" fill="currentColor"/>' +
+    '<g class="tray-waves" fill="none" stroke="currentColor" stroke-width="1.4">' +
+      '<path d="M11 5.4a3.6 3.6 0 0 1 0 5.2"/>' +
+      '<path d="M12.9 3.6a6.2 6.2 0 0 1 0 8.8"/>' +
+    '</g>' +
+    '<path class="tray-mute" d="M11 5.5l4 5M15 5.5l-4 5" fill="none" ' +
+      'stroke="currentColor" stroke-width="1.4"/>' +
+  '</svg>';
+
+function buildSoundToggle() {
+  const slot = document.querySelector(".tray-icon");
+  if (!slot) return;
+
+  const btn = el("button", "tray-sound");
+  btn.type = "button";
+  btn.innerHTML = SPEAKER;            // a constant in this file, no input
+  slot.replaceWith(btn);
+
+  sound.onChange(function (on) {
+    btn.classList.toggle("is-muted", !on);
+    btn.title = on ? "Sound on - click to mute" : "Sound off - click to unmute";
+    btn.setAttribute("aria-label", btn.title);
+    btn.setAttribute("aria-pressed", String(on));
+  });
+
+  btn.addEventListener("click", function () {
+    //  Toggled first, so switching sound ON is confirmed by a sound.
+    //  The click is still the live gesture, which is the only thing
+    //  that lets the audio context start at all.
+    if (sound.toggle()) sound.play("click");
   });
 }
 

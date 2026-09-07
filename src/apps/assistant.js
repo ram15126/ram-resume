@@ -10,6 +10,7 @@
 
 import { assistant } from "../../config/assistant.js";
 import { renderMarkdown, toSections } from "../lib/markdown.js";
+import { sound } from "../lib/sound.js";
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -146,6 +147,7 @@ export const assistantApp = {
       if (!question || busy) return;
 
       busy = true;
+      sound.play("click");
       input.value = "";
       input.disabled = true;
       send.disabled = true;
@@ -173,12 +175,16 @@ export const assistantApp = {
             "The assistant's backend is not running. It needs `vercel dev` " +
             "locally, or a deploy to Vercel — a plain file server cannot " +
             "answer questions. Everything else on this desktop works without it.";
+          sound.play("error");
           api.setStatus("No backend");
           return;
         }
 
         const data = await response.json();
         thinking.bubble.classList.remove("is-thinking");
+        //  The answer can take a couple of seconds, by which time a
+        //  visitor may well be reading something else on the desktop.
+        sound.play("notify");
         renderMarkdown(thinking.bubble, data.answer || assistant.guardrails.refusals[0]);
 
         // Without a model key the server quotes him rather than writing
@@ -210,6 +216,7 @@ export const assistantApp = {
         thinking.bubble.textContent =
           "I could not reach the assistant. Check your connection, or email " +
           "him directly at ramakrishnan15126@gmail.com.";
+        sound.play("error");
         api.setStatus("Connection failed");
       } finally {
         busy = false;

@@ -4,6 +4,7 @@
 // =====================================================================
 
 import { iconUrl } from "./iconart.js";
+import { sound } from "../lib/sound.js";
 
 const windows = new Map();   // id -> window record
 let zTop = 10;
@@ -63,6 +64,7 @@ export function focusWindow(id) {
 export function minimiseWindow(id) {
   const rec = windows.get(id);
   if (!rec) return;
+  sound.play("minimise");
   rec.minimised = true;
   rec.focused = false;
   rec.el.hidden = true;
@@ -79,6 +81,7 @@ export function minimiseWindow(id) {
 export function toggleMaximise(id) {
   const rec = windows.get(id);
   if (!rec) return;
+  sound.play(rec.maximised ? "minimise" : "maximise");
   if (rec.maximised) {
     rec.maximised = false;
     rec.el.classList.remove("is-maximised");
@@ -103,6 +106,7 @@ export function toggleMaximise(id) {
 export function closeWindow(id) {
   const rec = windows.get(id);
   if (!rec) return;
+  sound.play("close");
   if (typeof rec.onClose === "function") rec.onClose();
   rec.el.remove();
   windows.delete(id);
@@ -220,6 +224,8 @@ export function openWindow(opts) {
     focusWindow(opts.id);
     return windows.get(opts.id);
   }
+
+  sound.play("open");
 
   const b = desktopBounds();
   const narrow = b.w < 720;

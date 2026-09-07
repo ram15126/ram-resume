@@ -11,6 +11,7 @@
 // =====================================================================
 
 import { assistant } from "../../config/assistant.js";
+import { sound } from "../lib/sound.js";
 import { mascotUrl } from "./mascotart.js";
 import { launch } from "../apps/registry.js";
 import { onWindowsChanged } from "./wm.js";
@@ -59,6 +60,10 @@ function startIdleLoop() {
 function showBalloon(text, autoHideMs) {
   if (!balloon) return;
   balloon.querySelector(".mascot-balloon-text").textContent = text;
+  //  It has just spoken up unprompted in the corner of the screen; a
+  //  quiet two-note chime is what makes that read as friendly rather
+  //  than as something that appeared while you were not looking.
+  if (balloon.hidden) sound.play("notify");
   balloon.hidden = false;
   clearTimeout(hideTimer);
   if (autoHideMs) {

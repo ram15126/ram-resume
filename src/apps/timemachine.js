@@ -9,6 +9,8 @@
 //  it cannot half-load and it cannot strand you.
 // =====================================================================
 
+import { sound } from "../lib/sound.js";
+
 // Root-absolute and extension-less: vercel.json sets cleanUrls, so a
 // ".html" URL is redirected, and a relative one resolves differently
 // depending on whether the current URL has a trailing slash.
@@ -41,6 +43,9 @@ function depart() {
   stage.appendChild(readout);
   stage.appendChild(flash);
   document.body.appendChild(stage);
+  //  The spin-up runs for SPIN_MS and the sweep is a second and a half,
+  //  so it plays under the animation rather than after it.
+  sound.play("warp");
   document.body.classList.add("tm-departing");
 
   const started = Date.now();

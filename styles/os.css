@@ -1083,6 +1083,29 @@ body.tm-arriving::before {
   background: var(--brand-logo);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
 }
+
+/*  The tray speaker. A tray icon in this era was flat and unbordered
+    until you hovered it, so it stays that way here rather than becoming
+    a button with a bevel.  */
+.tray-sound {
+  display: flex; align-items: center;
+  padding: 1px 2px;
+  border: 0;
+  background: none;
+  /*  Explicit, because a global rule sets every button to var(--text)
+      for the High Contrast schemes — and var(--text) on the dark
+      taskbar is the one place that makes a control invisible.  */
+  color: inherit;
+  cursor: default;
+  line-height: 0;
+  opacity: .85;
+}
+.tray-sound:hover { opacity: 1; }
+.tray-sound:focus-visible { outline: 1px dotted currentColor; outline-offset: 1px; }
+.tray-sound .tray-mute { display: none; }
+.tray-sound.is-muted { opacity: .55; }
+.tray-sound.is-muted .tray-waves { display: none; }
+.tray-sound.is-muted .tray-mute { display: block; }
 .clock { font-size: 11px; font-variant-numeric: tabular-nums; text-shadow: 1px 1px 1px rgba(0,0,0,.35); }
 
 /* =====================================================  start menu  */

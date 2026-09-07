@@ -18,6 +18,7 @@
 
 import { voice } from "../config/voice.js";
 import { quotes, nav, tools, layout } from "../config/stack.js";
+import { sound } from "../../src/lib/sound.js";
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -258,6 +259,23 @@ export function buildPage(root) {
     links.appendChild(a);
   });
   header.appendChild(links);
+
+  /*  The mute, in the nav rather than a tray — this site has no tray,
+      and a page that makes a noise with no visible way to stop it is
+      the thing everyone hates. Shares its state with the 98 desktop
+      through the same key, so muting on one mutes both.  */
+  const mute = el("button", "nav-mute");
+  mute.type = "button";
+  sound.onChange(function (on) {
+    mute.textContent = on ? "SOUND ON" : "SOUND OFF";
+    mute.title = on ? "Mute" : "Unmute";
+    mute.setAttribute("aria-pressed", String(on));
+  });
+  mute.addEventListener("click", function () {
+    if (sound.toggle()) sound.play("click");
+  });
+  header.appendChild(mute);
+
   root.appendChild(header);
 
   // ---- ACT 1 · ink ------------------------------------------------

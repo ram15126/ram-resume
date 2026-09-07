@@ -28,6 +28,7 @@
 import { assistant } from "../../config/assistant.js";
 import { voice } from "../config/voice.js";
 import { renderMarkdown, toSections } from "../../src/lib/markdown.js";
+import { sound } from "../../src/lib/sound.js";
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -264,6 +265,7 @@ export function mountAssistant() {
     if (!question || busy) return;
 
     busy = true;
+    sound.play("click");
     input.value = "";
     input.disabled = true;
     send.disabled = true;
@@ -292,12 +294,14 @@ export function mountAssistant() {
           "The assistant's backend is not running. It needs `vercel dev` locally, " +
           "or a deploy to Vercel — a plain file server cannot answer questions. " +
           "Everything else on this site works without it.";
+        sound.play("error");
         status.textContent = "No backend";
         return;
       }
 
       const data = await response.json();
       thinking.bubble.classList.remove("is-thinking");
+      sound.play("notify");
       renderMarkdown(thinking.bubble, data.answer || assistant.guardrails.refusals[0]);
 
       if (data.note) thinking.row.appendChild(el("p", "ask-note", data.note));
@@ -322,6 +326,7 @@ export function mountAssistant() {
       thinking.bubble.textContent =
         "I could not reach the assistant. Check your connection, or email him " +
         "directly at " + voice.contact.email + ".";
+      sound.play("error");
       status.textContent = "Connection failed";
     } finally {
       busy = false;
